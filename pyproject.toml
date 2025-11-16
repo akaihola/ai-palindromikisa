@@ -12,6 +12,7 @@ dependencies = [
     "llm",
     "llm-anthropic",
     "llm-gemini",
+    "llm-openrouter",
     "ruamel-yaml>=0.18.16",
 ]
 
