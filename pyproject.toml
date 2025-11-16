@@ -1,0 +1,17 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "ai-palindromikisa"
+version = "0.1.0"
+description = "AI Palindrome Benchmark - evaluating LLM capability for creating palindromes"
+requires-python = ">=3.10"
+dependencies = [
+    "pyyaml",
+    "llm",
+    "llm-anthropic",
+]
+
+[project.scripts]
+benchmark = "ai_palindromikisa.benchmark:main"
