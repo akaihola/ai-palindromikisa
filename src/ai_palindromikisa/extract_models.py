@@ -4,6 +4,7 @@ Extract tested models from benchmark logs.
 This script parses YAML files in the benchmark_logs directory to extract model information.
 """
 
+import argparse
 import os
 from datetime import datetime
 from pathlib import Path
@@ -86,6 +87,13 @@ def extract_models_from_logs(benchmark_dir="../../benchmark_logs"):
 
 def main():
     """Main function to run the model extraction."""
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        prog="ai-palindromikisa stats",
+        description="Extract and display statistics from benchmark logs",
+    )
+    parser.parse_args()
+
     print("AI Palindromikisa - Model Extraction Tool")
     print("=" * 50)
     print(f"Running at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
