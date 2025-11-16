@@ -13,7 +13,9 @@ import yaml
 
 def extract_models_from_logs(benchmark_dir="../../benchmark_logs"):
     """Extract model information from all YAML files in benchmark directory."""
-    benchmark_path = Path(benchmark_dir)
+    # Get the script's directory and make benchmark_logs path relative to it
+    script_dir = Path(__file__).parent.parent.parent
+    benchmark_path = script_dir / "benchmark_logs"
 
     if not benchmark_path.exists():
         print(f"Error: Benchmark directory '{benchmark_dir}' not found.")
