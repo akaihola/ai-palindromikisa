@@ -1,0 +1,58 @@
+date: '2025-11-16'
+model: models/gemini-gemini-2.5-pro-1.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  VASTAUS:
+
+  {prompt}
+tasks:
+  - prompt: Suomalainen kaksikirjaiminen paikannimi
+    answer: ii
+    is_correct: true
+    duration_seconds: 13.89
+  - prompt: Kolmekirjaiminen sana, käytä vain kirjaimia T ja U
+    answer: tut
+    is_correct: false
+    duration_seconds: 9.54
+  - prompt: Nelikirjaiminen sana, käytä vain kirjaimia Y ja S
+    answer: syys
+    is_correct: true
+    duration_seconds: 11.09
+  - prompt: Viisikirjaiminen sana, kuvaa henkilöä joka ajaa
+    answer: ajaja
+    is_correct: true
+    duration_seconds: 9.18
+  - prompt: "Järjestyslukusana kirjaimin kirjoitettuna"
+    answer: sadas
+    is_correct: true
+    duration_seconds: 21.35
+  - prompt: >-
+      Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
+    answer: sakari, rakas.
+    is_correct: true
+    duration_seconds: 16.9
+  - prompt: Lause sanoista "pyhä", "iso", "hypnoosi" ja "on"
+    answer: iso on pyhä hypnoosi.
+    is_correct: true
+    duration_seconds: 109.08
+  - prompt: "Täydennä puuttuva kirjain: Assi _okaa kodissa."
+    answer: assi dokaa kodissa.
+    is_correct: true
+    duration_seconds: 18.69
+  - prompt: "Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!"
+    answer: sanni katato, isä, siis ota takinnas!
+    is_correct: false
+    duration_seconds: 153.2
