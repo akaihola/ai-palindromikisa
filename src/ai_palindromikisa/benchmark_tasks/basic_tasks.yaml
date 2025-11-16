@@ -17,40 +17,26 @@ system_prompt: |-
   Luo seuraavanlainen palindromi:
   VASTAUS:
 tasks:
-  - id: word_gen_1
-    prompt: Suomalainen kaksikirjaiminen paikannimi
-    type: generate
+  - prompt: Suomalainen kaksikirjaiminen paikannimi
     reference: Ii
-  - id: word_gen_2
-    prompt: Kolmekirjaiminen sana, käytä vain kirjaimia T ja U
-    type: generate
+  - prompt: Kolmekirjaiminen sana, käytä vain kirjaimia T ja U
     reference: utu
-  - id: word_gen_3
-    prompt: Nelikirjaiminen sana, käytä vain kirjaimia Y ja S
-    type: generate
+  - prompt: Nelikirjaiminen sana, käytä vain kirjaimia Y ja S
     reference: syys
-  - id: word_gen_4
-    prompt: Viisikirjaiminen sana, kuvaa henkilöä joka ajaa
-    type: generate
+  - prompt: Viisikirjaiminen sana, kuvaa henkilöä joka ajaa
     reference: ajaja
-  - id: word_gen_5
-    prompt: "Järjestyslukusana kirjaimin kirjoitettuna"
-    type: generate
+  - prompt: "Järjestyslukusana kirjaimin kirjoitettuna"
     reference: sadas
-  - id: sentence_gen_1
-    prompt: >-
+  - prompt: >-
       Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
-    type: generate
     reference: Sakari rakas.
-  - id: sentence_gen_2
-    prompt: Lause sanoista "pyhä", "iso", "hypnoosi" ja "on"
-    type: generate
+  - prompt: Lause sanoista "pyhä", "iso", "hypnoosi" ja "on"
     reference: Iso on pyhä hypnoosi.
-  - id: complete_1
-    prompt: "Täydennä puuttuva kirjain: Assi _okaa kodissa."
-    type: complete
+  - prompt: "Täydennä puuttuva kirjain: Assi _okaa kodissa."
     reference: Assi dokaa kodissa.
-  - id: complete_2
-    prompt: "Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!"
-    type: complete
+  - prompt: "Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!"
     reference: Sanni katosi, isä, siis ota kinnas!
+  - prompt: "Lause, jossa sekä tavit että sudet edustivat"
+    reference: Tavit, sudet edustivat.
+  - prompt: "Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _."
+    reference: Isoja hajuja hajosi.
