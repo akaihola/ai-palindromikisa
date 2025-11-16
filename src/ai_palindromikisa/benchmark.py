@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import re
 from pathlib import Path
 
@@ -17,8 +18,18 @@ def extract_palindrome(text):
 
 
 def main():
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description="Run palindrome benchmark tasks")
+    parser.add_argument(
+        "-m",
+        "--model",
+        default="gemini/gemini-2.0-flash",
+        help="Model to use for the benchmark (default: gemini/gemini-2.0-flash)",
+    )
+    args = parser.parse_args()
+
     # Load the tasks from YAML using pathlib
-    tasks_file = Path(__file__).parent / "tasks.yaml"
+    tasks_file = Path(__file__).parent / "benchmark_tasks/basic_tasks.yaml"
 
     with open(tasks_file, "r", encoding="utf-8") as f:
         data = yaml.safe_load(f)
@@ -38,7 +49,7 @@ def main():
 
         full_prompt = f"{system_prompt}\n\n{prompt}"
 
-        model = llm.get_model()
+        model = llm.get_model(args.model)
         response = model.prompt(full_prompt)
         response_text = extract_palindrome(response.text()).strip().lower()
 

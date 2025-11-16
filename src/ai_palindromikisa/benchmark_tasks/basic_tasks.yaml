@@ -1,7 +1,9 @@
+---
 title: AI Palindrome Benchmark
 system_prompt: |
   Olet erinomainen palindromien kirjoittaja.
   Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
   Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
 
   Esimerkki:
@@ -32,11 +34,12 @@ tasks:
     type: generate
     reference: ajaja
   - id: word_gen_5
-    prompt: Järjestyslukusana kirjaimin kirjoitettuna
+    prompt: "Järjestyslukusana kirjaimin kirjoitettuna"
     type: generate
     reference: sadas
   - id: sentence_gen_1
-    prompt: Kaksi sanaa, jotka Sakarin mielitietty voisi lausua Sakarille
+    prompt: >
+      Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
     type: generate
     reference: Sakari rakas.
   - id: sentence_gen_2
@@ -44,10 +47,10 @@ tasks:
     type: generate
     reference: Iso on pyhä hypnoosi.
   - id: complete_1
-    prompt: Täydennä puuttuva kirjain
+    prompt: "Täydennä puuttuva kirjain: Assi _okaa kodissa."
     type: complete
-    reference: Assi _okaa kodissa.
+    reference: Assi dokaa kodissa.
   - id: complete_2
-    prompt: Täydennä puuttuvat kirjaimet
+    prompt: "Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!"
     type: complete
-    reference: Sanni kat___, isä, ota ______!
+    reference: Sanni katosi, isä, siis ota kinnas!

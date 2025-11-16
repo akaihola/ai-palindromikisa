@@ -11,6 +11,7 @@ dependencies = [
     "pyyaml",
     "llm",
     "llm-anthropic",
+    "llm-gemini",
 ]
 
 [project.scripts]
