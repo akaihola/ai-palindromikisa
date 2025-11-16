@@ -55,11 +55,29 @@ tasks:
     answer: sanni katosi, isä, siis ota kinnas!
     is_correct: true
     duration_seconds: 40.15
-  - prompt: "Lause, jossa sekä tavit että sudet edustivat"
+  - prompt: Lause, jossa sekä tavit että sudet edustivat
     answer: tavit näki sudet, niin sudet näki tavit.
     is_correct: false
     duration_seconds: 68.24
-  - prompt: "Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _."
+  - prompt: 'Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _.'
     answer: isoja hajuja hajosi
     is_correct: true
     duration_seconds: 9.32
+  - prompt: Tämä kaksisanainen lause väittää ilman verbiä, että laiskoja ihmisiä hakeutuisi taksialalle töihin.
+    answer: ala taksia, laiskat ala!
+    is_correct: false
+    duration_seconds: 26.15
+  - prompt: 'Täytä keskelle yksi sana: Niskasta _______, tukat saksin.'
+    answer: niskasta kautta, tukat saksin.
+    is_correct: false
+    duration_seconds: 60.84
+  - prompt: >-
+      Täydennä alku ja loppu lyhyesti.
+      Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
+    answer: lada, anna! paavi vapaa, nanna dal.
+    is_correct: false
+    duration_seconds: 30.53
+  - prompt: "Täydennä alkuun yksi lyhyt sana: __ sivele tällä televisio!"
+    answer: oi sivele tällä televisio!
+    is_correct: true
+    duration_seconds: 65.83

@@ -59,7 +59,25 @@ tasks:
     answer: tavit ja sudet! edustavat sudettivat.
     is_correct: false
     duration_seconds: 0.67
-  - prompt: "Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _."
+  - prompt: 'Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _.'
     answer: isoja hajuja sai, ujahajosi.
     is_correct: false
     duration_seconds: 0.69
+  - prompt: Tämä kaksisanainen lause väittää ilman verbiä, että laiskoja ihmisiä hakeutuisi taksialalle töihin.
+    answer: aloilla taksi, iskit, alaköinä!
+    is_correct: false
+    duration_seconds: 0.52
+  - prompt: 'Täytä keskelle yksi sana: Niskasta _______, tukat saksin.'
+    answer: niskasta katso, tukat saksin.
+    is_correct: false
+    duration_seconds: 0.74
+  - prompt: >-
+      Täydennä alku ja loppu lyhyesti.
+      Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
+    answer: paavi volgalla, alla glovi, vaap.
+    is_correct: false
+    duration_seconds: 0.5
+  - prompt: "Täydennä alkuun yksi lyhyt sana: __ sivele tällä televisio!"
+    answer: hah, sivele tällä televisio! hah!
+    is_correct: false
+    duration_seconds: 0.62

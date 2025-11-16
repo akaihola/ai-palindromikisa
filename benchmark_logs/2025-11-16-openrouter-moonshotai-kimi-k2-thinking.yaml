@@ -1,6 +1,6 @@
----
-title: AI Palindrome Benchmark
-system_prompt: |-
+date: '2025-11-16'
+model: models/openrouter-moonshotai-kimi-k2-thinking-1.yaml
+prompt_template: |-
   Olet erinomainen palindromien kirjoittaja.
   Luo tai täydennä pyydetynlainen palindromi.
   Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
@@ -16,39 +16,51 @@ system_prompt: |-
   TEHTÄVÄ
   Luo seuraavanlainen palindromi:
   VASTAUS:
+
+  {prompt}
 tasks:
   - prompt: Suomalainen kaksikirjaiminen paikannimi
-    reference: Ii
+    answer: iin ii olo iin ii
+    is_correct: false
+    duration_seconds: 110.55
   - prompt: Kolmekirjaiminen sana, käytä vain kirjaimia T ja U
-    reference: utu
+    answer: tut
+    is_correct: false
+    duration_seconds: 8.99
   - prompt: Nelikirjaiminen sana, käytä vain kirjaimia Y ja S
-    reference: syys
+    answer: yssy
+    is_correct: false
+    duration_seconds: 5.55
   - prompt: Viisikirjaiminen sana, kuvaa henkilöä joka ajaa
-    reference: ajaja
+    answer: '"ajuri, aja, iruja."'
+    is_correct: false
+    duration_seconds: 42.28
   - prompt: "Järjestyslukusana kirjaimin kirjoitettuna"
-    reference: sadas
+    answer: '"kolmas neito on etien", totesi sam lok.'
+    is_correct: false
+    duration_seconds: 54.29
   - prompt: >-
       Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
-    reference: Sakari rakas.
+    answer: sakari, rakas
+    is_correct: true
+    duration_seconds: 62.18
   - prompt: Lause sanoista "pyhä", "iso", "hypnoosi" ja "on"
-    reference: Iso on pyhä hypnoosi.
+    answer: 'on hypnoosi iso pyhä: pyhä iso hypnoosi on'
+    is_correct: false
+    duration_seconds: 40.53
   - prompt: "Täydennä puuttuva kirjain: Assi _okaa kodissa."
-    reference: Assi dokaa kodissa.
+    answer: assi dokaa kodissa
+    is_correct: true
+    duration_seconds: 9.64
   - prompt: "Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!"
-    reference: Sanni katosi, isä, siis ota kinnas!
+    answer: sanni katkoo, isä, siis ota ookatinnas!
+    is_correct: false
+    duration_seconds: 236.77
   - prompt: "Lause, jossa sekä tavit että sudet edustivat"
-    reference: Tavit, sudet edustivat.
+    answer: ''
+    is_correct: false
+    duration_seconds: 52.3
   - prompt: "Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _."
-    reference: Isoja hajuja hajosi.
-  - prompt: >-
-      Tämä kaksisanainen lause väittää ilman verbiä, että laiskoja ihmisiä hakeutuisi
-      taksialalle töihin.
-    reference: "Taksialalla laiskat."
-  - prompt: >-
-      Täydennä alku ja loppu lyhyesti.
-      Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
-    reference: >-
-      Amalia Ladallaan. Uolevi. Otitte, imaisit.
-      Uutisia mietti toivelounaalla Dalai-Lama.
-  - prompt: "Täydennä alkuun yksi lyhyt sana: __ sivele tällä televisio!"
-    reference: "Oi, sivele tällä televisio!"
+    answer: isoja hajuja ajujah ajosi
+    is_correct: false
+    duration_seconds: 121.58
