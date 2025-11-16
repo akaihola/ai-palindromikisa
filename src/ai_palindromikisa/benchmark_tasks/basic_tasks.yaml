@@ -1,6 +1,6 @@
 ---
 title: AI Palindrome Benchmark
-system_prompt: |
+system_prompt: |-
   Olet erinomainen palindromien kirjoittaja.
   Luo tai täydennä pyydetynlainen palindromi.
   Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
@@ -38,7 +38,7 @@ tasks:
     type: generate
     reference: sadas
   - id: sentence_gen_1
-    prompt: >
+    prompt: >-
       Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
     type: generate
     reference: Sakari rakas.

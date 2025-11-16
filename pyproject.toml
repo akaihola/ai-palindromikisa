@@ -12,6 +12,7 @@ dependencies = [
     "llm",
     "llm-anthropic",
     "llm-gemini",
+    "ruamel-yaml>=0.18.16",
 ]
 
 [dependency-groups]
