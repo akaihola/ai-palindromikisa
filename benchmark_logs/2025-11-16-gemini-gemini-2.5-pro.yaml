@@ -35,12 +35,11 @@ tasks:
     answer: ajaja
     is_correct: true
     duration_seconds: 9.18
-  - prompt: "Järjestyslukusana kirjaimin kirjoitettuna"
+  - prompt: Järjestyslukusana kirjaimin kirjoitettuna
     answer: sadas
     is_correct: true
     duration_seconds: 21.35
-  - prompt: >-
-      Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
+  - prompt: Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
     answer: sakari, rakas.
     is_correct: true
     duration_seconds: 16.9
@@ -48,11 +47,19 @@ tasks:
     answer: iso on pyhä hypnoosi.
     is_correct: true
     duration_seconds: 109.08
-  - prompt: "Täydennä puuttuva kirjain: Assi _okaa kodissa."
+  - prompt: 'Täydennä puuttuva kirjain: Assi _okaa kodissa.'
     answer: assi dokaa kodissa.
     is_correct: true
     duration_seconds: 18.69
-  - prompt: "Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!"
+  - prompt: 'Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!'
     answer: sanni katato, isä, siis ota takinnas!
     is_correct: false
     duration_seconds: 153.2
+  - prompt: "Lause, jossa sekä tavit että sudet edustivat"
+    answer: tavat, sudet edustavat.
+    is_correct: false
+    duration_seconds: 26.44
+  - prompt: "Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _."
+    answer: isoja hajuja, ajuja hajosi.
+    is_correct: false
+    duration_seconds: 14.86

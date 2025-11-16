@@ -1,0 +1,5 @@
+# Model Configuration: OpenRouter Z AI GLM 4.6
+# Provider: OpenRouter
+# Model: openrouter/z-ai/glm-4.6
+
+name: "openrouter/z-ai/glm-4.6"

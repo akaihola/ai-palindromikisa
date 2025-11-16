@@ -1,0 +1,5 @@
+# Model Configuration: Anthropic Claude Haiku 4.5
+# Provider: Anthropic
+# Model: claude-haiku-4.5
+
+name: "anthropic/claude-haiku-4.5"

@@ -35,12 +35,11 @@ tasks:
     answer: kuljettaja
     is_correct: false
     duration_seconds: 3.3
-  - prompt: "Järjestyslukusana kirjaimin kirjoitettuna"
+  - prompt: Järjestyslukusana kirjaimin kirjoitettuna
     answer: kaksikymmentä niistä karvannaksikymmentä kaksikymmentä kannavan karvannaksikymmentä niistä kaksikymmentä.
     is_correct: false
     duration_seconds: 1.8
-  - prompt: >-
-      Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
+  - prompt: Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
     answer: sakari, ira rais.
     is_correct: false
     duration_seconds: 1.32
@@ -48,11 +47,11 @@ tasks:
     answer: on hypnoosi iso pyhä, pyhä iso hypnoosi on.
     is_correct: false
     duration_seconds: 1.95
-  - prompt: "Täydennä puuttuva kirjain: Assi _okaa kodissa."
+  - prompt: 'Täydennä puuttuva kirjain: Assi _okaa kodissa.'
     answer: assi nokaa kodissa.
     is_correct: false
     duration_seconds: 2.8
-  - prompt: "Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!"
+  - prompt: 'Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!'
     answer: sanni kataksi isä siis ota kataksi sanna!
     is_correct: false
     duration_seconds: 1.36

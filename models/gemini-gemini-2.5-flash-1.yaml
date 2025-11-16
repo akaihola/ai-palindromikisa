@@ -1,0 +1,5 @@
+# Model Configuration: Google Gemini Gemini 2.5 Flash
+# Provider: Google
+# Model: gemini/gemini-2.5-flash
+
+name: "gemini/gemini-2.5-flash"
