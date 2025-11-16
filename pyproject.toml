@@ -14,5 +14,11 @@ dependencies = [
     "llm-gemini",
 ]
 
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-mock",
+]
+
 [project.scripts]
 benchmark = "ai_palindromikisa.benchmark:main"
