@@ -4,30 +4,13 @@
 
 This project uses `uv` as the package manager and dependency resolver. You must use `uv` commands to manage dependencies and run the project.
 
-### Installing Dependencies
-
-To install all dependencies, run:
-```bash
-uv sync
-```
+**For instructions on how to run the apps in this project, please read README.md.**
 
 ### Adding New Dependencies
 
 When adding new dependencies (like `llm-gemini`), update `pyproject.toml` and then run:
 ```bash
 uv sync
-```
-
-### Running the Project
-
-Use `uv` to run commands:
-```bash
-uv run python -m ai_palindromikisa.benchmark -m gemini/gemini-2.0-flash
-```
-
-or use the script entry point:
-```bash
-uv run benchmark -m gemini/gemini-2.0-flash
 ```
 
 ### Important Notes
