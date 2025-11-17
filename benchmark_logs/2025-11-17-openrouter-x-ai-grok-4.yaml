@@ -1,0 +1,63 @@
+date: 2025-11-17
+model: models/openrouter-x-ai-grok-4-1.yaml
+prompt_template: |
+  Olet tekoäly, joka vastaa ainoastaan palindromilla. Vastaa aina ja vain palindromilla, äläkä koskaan käytä mitään muita merkkejä tai sanoja. Älä selitä mitään, äläkä käytä lainausmerkkejä tai muita erikoismerkkejä. Vastaus on oltava täysin palindromi, etkä voi lisätä siihen mitään muuta.
+
+  {prompt}
+tasks:
+  - prompt: Suomalainen kaksikirjaiminen paikannimi
+    answer: ii
+    is_correct: true
+    duration_seconds: 39.9
+  - prompt: Kolmekirjaiminen sana, käytä vain kirjaimia T ja U
+    answer: utu
+    is_correct: true
+    duration_seconds: 44.22
+  - prompt: Nelikirjaiminen sana, käytä vain kirjaimia Y ja S
+    answer: syys
+    is_correct: true
+    duration_seconds: 47.15
+  - prompt: Viisikirjaiminen sana, kuvaa henkilöä joka ajaa
+    answer: ajaja
+    is_correct: true
+    duration_seconds: 33.6
+  - prompt: Järjestyslukusana kirjaimin kirjoitettuna
+    answer: sadas
+    is_correct: true
+    duration_seconds: 118.37
+  - prompt: Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
+    answer: sakari rakas
+    is_correct: true
+    duration_seconds: 184.1
+  - prompt: 'Lause sanoista "pyhä", "iso", "hypnoosi" ja "on"'
+    answer: iso on pyhä hypnoosi
+    is_correct: true
+    duration_seconds: 100.78
+  - prompt: 'Täydennä puuttuva kirjain: Assi _okaa kodissa.'
+    answer: assi dokaa kodissa
+    is_correct: true
+    duration_seconds: 24.44
+  - prompt: 'Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!'
+    answer: sanni katosi, isä, siis ota kinnas!
+    is_correct: true
+    duration_seconds: 137.26
+  - prompt: Lause, jossa sekä tavit että sudet edustivat
+    answer: tavit sudet edustivat
+    is_correct: true
+    duration_seconds: 528.36
+  - prompt: 'Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _.'
+    answer: isoja hajuja hajosi
+    is_correct: true
+    duration_seconds: 213.99
+  - prompt: Tämä kaksisanainen lause väittää ilman verbiä, että laiskoja ihmisiä hakeutuisi taksialalle töihin.
+    answer: taksialalla laiskat
+    is_correct: true
+    duration_seconds: 241.73
+  - prompt: Täydennä alku ja loppu lyhyesti. Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
+    answer: amalia ladallaan. uolevi. otitte, imaisit. uutisia mietti toivelounaalla dalai-lama.
+    is_correct: true
+    duration_seconds: 139.33
+  - prompt: 'Täytä keskelle yksi sana: Niskasta _______, tukat saksin.'
+    answer: niskasta kutitti, tukat saksin
+    is_correct: true
+    duration_seconds: 156.78
