@@ -1,0 +1,5 @@
+# Model Configuration: MoonshotAI Kimi K2 Thinking via OpenRouter
+# Provider: OpenRouter
+# Model: openrouter/moonshotai/kimi-k2-thinking
+
+name: "openrouter/moonshotai/kimi-k2-thinking"

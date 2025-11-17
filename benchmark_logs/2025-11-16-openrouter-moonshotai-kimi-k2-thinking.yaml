@@ -35,12 +35,11 @@ tasks:
     answer: '"ajuri, aja, iruja."'
     is_correct: false
     duration_seconds: 42.28
-  - prompt: "Järjestyslukusana kirjaimin kirjoitettuna"
+  - prompt: Järjestyslukusana kirjaimin kirjoitettuna
     answer: '"kolmas neito on etien", totesi sam lok.'
     is_correct: false
     duration_seconds: 54.29
-  - prompt: >-
-      Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
+  - prompt: Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
     answer: sakari, rakas
     is_correct: true
     duration_seconds: 62.18
@@ -48,19 +47,39 @@ tasks:
     answer: 'on hypnoosi iso pyhä: pyhä iso hypnoosi on'
     is_correct: false
     duration_seconds: 40.53
-  - prompt: "Täydennä puuttuva kirjain: Assi _okaa kodissa."
+  - prompt: 'Täydennä puuttuva kirjain: Assi _okaa kodissa.'
     answer: assi dokaa kodissa
     is_correct: true
     duration_seconds: 9.64
-  - prompt: "Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!"
+  - prompt: 'Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!'
     answer: sanni katkoo, isä, siis ota ookatinnas!
     is_correct: false
     duration_seconds: 236.77
-  - prompt: "Lause, jossa sekä tavit että sudet edustivat"
+  - prompt: Lause, jossa sekä tavit että sudet edustivat
     answer: ''
     is_correct: false
     duration_seconds: 52.3
-  - prompt: "Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _."
+  - prompt: 'Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _.'
     answer: isoja hajuja ajujah ajosi
     is_correct: false
     duration_seconds: 121.58
+  - prompt: Tämä kaksisanainen lause väittää ilman verbiä, että laiskoja ihmisiä hakeutuisi taksialalle töihin.
+    answer: ''
+    is_correct: false
+    duration_seconds: 268.62
+  - prompt: Täydennä alku ja loppu lyhyesti. Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
+    answer: ''
+    is_correct: false
+    duration_seconds: 245.53
+  - prompt: 'Täydennä alkuun yksi lyhyt sana: __ sivele tällä televisio!'
+    answer: älä sivele tällä televisio! oisivelet ällät elevis älä.
+    is_correct: false
+    duration_seconds: 248.73
+  - prompt: 'Poista yksi sana niin että jäljelle jää edelleen palindromi: Oi, sivele tällä televisio!'
+    answer: oi, sivele televisio!
+    is_correct: true
+    duration_seconds: 170.83
+  - prompt: "Täytä keskelle yksi sana: Niskasta _______, tukat saksin."
+    answer: niskasta saksin, tukat saksin
+    is_correct: false
+    duration_seconds: 198.91

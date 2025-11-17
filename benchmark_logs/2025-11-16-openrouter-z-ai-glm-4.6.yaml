@@ -71,13 +71,17 @@ tasks:
     answer: niskasta takut, tukat saksin.
     is_correct: false
     duration_seconds: 41.29
-  - prompt: >-
-      Täydennä alku ja loppu lyhyesti.
-      Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
+  - prompt: Täydennä alku ja loppu lyhyesti. Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
     answer: 'lada, pappi: "anna!"'
     is_correct: false
     duration_seconds: 15.82
-  - prompt: "Täydennä alkuun yksi lyhyt sana: __ sivele tällä televisio!"
+  - prompt: 'Täydennä alkuun yksi lyhyt sana: __ sivele tällä televisio!'
     answer: aa sivele tällä televisio! oisivelet allät eveis aa
     is_correct: false
     duration_seconds: 38.29
+  - prompt: >-
+      Poista yksi sana niin että jäljelle jää edelleen palindromi:
+      Oi, sivele tällä televisio!
+    answer: ennen pete, tee, peten ne.
+    is_correct: false
+    duration_seconds: 23.51

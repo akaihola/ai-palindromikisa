@@ -50,5 +50,11 @@ tasks:
     reference: >-
       Amalia Ladallaan. Uolevi. Otitte, imaisit.
       Uutisia mietti toivelounaalla Dalai-Lama.
+  - prompt: "Täytä keskelle yksi sana: Niskasta _______, tukat saksin."
+    reference: "Niskasta kutitti, tukat saksin."
   - prompt: "Täydennä alkuun yksi lyhyt sana: __ sivele tällä televisio!"
     reference: "Oi, sivele tällä televisio!"
+  - prompt: >-
+      Poista yksi sana niin että jäljelle jää edelleen palindromi:
+      Oi, sivele tällä televisio!
+    reference: "Oi, sivele televisio!"
