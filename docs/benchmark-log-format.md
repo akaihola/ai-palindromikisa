@@ -15,14 +15,14 @@ Benchmark log files use the `.yaml` extension and follow this naming convention:
 date: string                       # Date in YYYY-MM-DD format
 model: string                      # Relative path to model file
 prompt_template: string             # Template containing {prompt} placeholder
-tasks: array                       # Individual task results
+tasks: array                       # Individual task results (see "Task Result Objects" below)
 ```
 
 ## Model Field
 
 ```yaml
 model: string                      # Relative path to model file
-# Format: models/<model>-<variation-index>
+# Format: models/<model>-<variation-index>.yaml
 # <model>: Model name with slashes mapped to dashes (e.g., gemini-gemini-2.0-flash)
 # <variation-index>: 1-based running index for different parameter variations
 # Examples:
@@ -48,6 +48,8 @@ Each task result in the `tasks` array contains:
   answer: string                   # Extracted palindrome content from model response
   is_correct: boolean              # Whether answer matches reference
   duration_seconds: number         # Time taken for this task
+  timestamp: string                # ISO-8601 UTC timestamp when the task request was sent (e.g. 2024-12-01T12:34:56Z)
+  metadata: object                 # All structured data returned by the llm model response for this task
 ```
 
 ## Complete Example
@@ -78,24 +80,30 @@ tasks:
     answer: "Ii"
     is_correct: true
     duration_seconds: 4.1
+    timestamp: "2024-12-01T10:15:30Z"
+    metadata: {}
 
   - prompt: "Täydennä puuttuva kirjain: Assi _okaa kodissa."
     answer: "Assi tokaa kodissa."
     is_correct: false
     duration_seconds: 3.2
+    timestamp: "2024-12-01T10:15:35Z"
+    metadata: {}
 ```
 
 ## Validation Rules
 
 ### Required Fields
 - `date`, `model`, `prompt_template`, `tasks` are mandatory
-- Each task must have: `prompt`, `answer`, `is_correct`, `duration_seconds`
+- Each task must have: `prompt`, `answer`, `is_correct`, `duration_seconds`, `timestamp`, `metadata`
 
 ### Data Types
 - Date must be in YYYY-MM-DD format
+- `timestamp` must be an ISO-8601 UTC datetime string (e.g. `"2024-12-01T12:34:56Z"`)
 - Durations must be in seconds (float)
 - Boolean values must be `true` or `false` (lowercase)
 - Prompt template must contain `{prompt}` placeholder
+- `metadata` must be a mapping/object containing the structured data returned by the `llm` model response
 
 ### Model Path Requirements
 - Model path must be relative to project root
