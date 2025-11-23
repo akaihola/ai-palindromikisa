@@ -1,17 +1,17 @@
 """Tests for benchmark logging functionality."""
 
 import tempfile
-from datetime import datetime
 from pathlib import Path
+from typing import cast
 
 import pytest
 import yaml
 
-from ai_palindromikisa.benchmark import create_log_file
+from ai_palindromikisa.logs import save_task_result
 
 
 class TestCreateLogFileIntegration:
-    """Integration tests for create_log_file function."""
+    """Integration tests for save_task_result function."""
 
     @pytest.fixture
     def mock_system_prompt(self):
@@ -80,15 +80,33 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
 
             try:
                 # Create the log file
-                log_path = create_log_file(
-                    model_name, mock_system_prompt, mock_tasks, mock_results
+                log_path = save_task_result(
+                    model_name,
+                    mock_system_prompt,
+                    mock_results[0]["prompt"],
+                    mock_results[0]["answer"],
+                    mock_results[0]["is_correct"],
+                    mock_results[0]["duration_seconds"],
+                )
+                assert (
+                    save_task_result(
+                        model_name,
+                        mock_system_prompt,
+                        mock_results[1]["prompt"],
+                        mock_results[1]["answer"],
+                        mock_results[1]["is_correct"],
+                        mock_results[1]["duration_seconds"],
+                    )
+                    == log_path
                 )
 
                 # Verify file was created
                 assert log_path.exists()
 
                 # Load and verify the YAML content
-                data = yaml.safe_load(log_path.read_text(encoding="utf-8"))
+                data = cast(
+                    "dict", yaml.safe_load(log_path.read_text(encoding="utf-8"))
+                )
 
                 # Verify required top-level fields
                 assert "date" in data
@@ -159,11 +177,30 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
             ai_palindromikisa.benchmark.__file__ = str(benchmark_file)
 
             try:
-                log_path = create_log_file(
-                    model_name, mock_system_prompt, mock_tasks, mock_results
+                # Create the log file
+                log_path = save_task_result(
+                    model_name,
+                    mock_system_prompt,
+                    mock_results[0]["prompt"],
+                    mock_results[0]["answer"],
+                    mock_results[0]["is_correct"],
+                    mock_results[0]["duration_seconds"],
+                )
+                assert (
+                    save_task_result(
+                        model_name,
+                        mock_system_prompt,
+                        mock_results[1]["prompt"],
+                        mock_results[1]["answer"],
+                        mock_results[1]["is_correct"],
+                        mock_results[1]["duration_seconds"],
+                    )
+                    == log_path
                 )
 
-                data = yaml.safe_load(log_path.read_text(encoding="utf-8"))
+                data = cast(
+                    "dict", yaml.safe_load(log_path.read_text(encoding="utf-8"))
+                )
 
                 # Verify model path conversion
                 assert data["model"] == "models/gemini-gemini-2.0-flash-1.yaml"
@@ -197,8 +234,25 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
                 benchmark_logs_dir = temp_path / "benchmark_logs"
                 assert not benchmark_logs_dir.exists()
 
-                log_path = create_log_file(
-                    model_name, mock_system_prompt, mock_tasks, mock_results
+                # Create the log file
+                log_path = save_task_result(
+                    model_name,
+                    mock_system_prompt,
+                    mock_results[0]["prompt"],
+                    mock_results[0]["answer"],
+                    mock_results[0]["is_correct"],
+                    mock_results[0]["duration_seconds"],
+                )
+                assert (
+                    save_task_result(
+                        model_name,
+                        mock_system_prompt,
+                        mock_results[1]["prompt"],
+                        mock_results[1]["answer"],
+                        mock_results[1]["is_correct"],
+                        mock_results[1]["duration_seconds"],
+                    )
+                    == log_path
                 )
 
                 # Verify directory was created
@@ -231,8 +285,25 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
             ai_palindromikisa.benchmark.__file__ = str(benchmark_file)
 
             try:
-                log_path = create_log_file(
-                    model_name, mock_system_prompt, mock_tasks, mock_results
+                # Create the log file
+                log_path = save_task_result(
+                    model_name,
+                    mock_system_prompt,
+                    mock_results[0]["prompt"],
+                    mock_results[0]["answer"],
+                    mock_results[0]["is_correct"],
+                    mock_results[0]["duration_seconds"],
+                )
+                assert (
+                    save_task_result(
+                        model_name,
+                        mock_system_prompt,
+                        mock_results[1]["prompt"],
+                        mock_results[1]["answer"],
+                        mock_results[1]["is_correct"],
+                        mock_results[1]["duration_seconds"],
+                    )
+                    == log_path
                 )
 
                 # Verify filename format: YYYY-MM-DD-model-name.yaml

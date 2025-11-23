@@ -5,9 +5,9 @@ This script parses YAML files in the benchmark_logs directory to extract model i
 """
 
 import argparse
-import os
 from datetime import datetime
 from pathlib import Path
+from typing import cast
 
 import yaml
 
@@ -36,7 +36,7 @@ def extract_models_from_logs(benchmark_dir="../../benchmark_logs"):
 
     for yaml_file in sorted(yaml_files):
         try:
-            data = yaml.safe_load(yaml_file.read_text(encoding="utf-8"))
+            data = cast("dict", yaml.safe_load(yaml_file.read_text(encoding="utf-8")))
 
             # Extract model information
             model_info = {
@@ -53,7 +53,7 @@ def extract_models_from_logs(benchmark_dir="../../benchmark_logs"):
             }
 
             # Extract model name from path (remove 'models/' prefix and version suffix)
-            model_path = model_info["model_path"]
+            model_path = cast("str", model_info["model_path"])
             if model_path.startswith("models/"):
                 model_name = model_path[7:]  # Remove 'models/' prefix
                 # Remove version suffix like '-1.yaml'

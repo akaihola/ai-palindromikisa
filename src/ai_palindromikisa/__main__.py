@@ -7,9 +7,7 @@ This module provides the main CLI interface with subcommands:
 - stats: Extract and display statistics from benchmark logs
 """
 
-import argparse
 import sys
-from pathlib import Path
 
 # Import the main functions from our modules
 from .benchmark import main as benchmark_main
