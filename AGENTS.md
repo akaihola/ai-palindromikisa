@@ -2,22 +2,13 @@
 
 ## Development Setup
 
-This project uses `uv` as the package manager and dependency resolver. You must use `uv` commands to manage dependencies and run the project.
+This project uses `uv` for dependency management and running code. See README.md for app instructions.
 
-**For instructions on how to run the apps in this project, please read README.md.**
-
-### Adding New Dependencies
-
-When adding new dependencies (like `llm-gemini`), update `pyproject.toml` and then run:
-```bash
-uv sync
-```
-
-### Important Notes
-
-- Do NOT use `pip install` directly - always use `uv sync`
-- Do NOT use `python` directly for running scripts - use `uv run`
-- The project relies on `uv` for proper dependency management and virtual environment handling
+**Key Commands:**
+- Add dependencies: Update `pyproject.toml`, then `uv sync`
+- Run scripts: Use `uv run` (not `python` directly)
+- Run benchmarks: `uv run ai-palindromikisa benchmark -m ALL --limit 1` (or `-m MODEL` for specific models)
+- Git commands: Always prefix with `git --no-pager` to avoid pagination
 
 ## Code Style Guidelines
 
