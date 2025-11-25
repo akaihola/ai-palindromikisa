@@ -101,8 +101,9 @@ def main() -> None:
             print(f"Reference: {reference}")
 
             response = model.prompt(full_prompt)
-            metadata = response.response_json or {}
             response_text = extract_palindrome(response.text()).strip().lower()
+            # Note: response_json is only populated after .text() consumes the stream
+            metadata = response.response_json or {}
 
             end_time = time.time()
             duration = end_time - start_time
