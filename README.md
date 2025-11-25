@@ -36,6 +36,23 @@ Use the script entry points directly:
 uv run benchmark -m gemini/gemini-2.0-flash
 ```
 
+## Testing
+
+Run the test suite:
+```bash
+uv run pytest
+```
+
+By default, tests that call real LLM APIs are skipped. To run live API tests:
+```bash
+uv run pytest -m live
+```
+
+To run all tests including live API tests:
+```bash
+uv run pytest -m ""
+```
+
 ## Project Structure
 
 - `models/` - Model configuration files
