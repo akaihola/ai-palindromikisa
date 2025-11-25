@@ -103,7 +103,7 @@ def main() -> None:
             response = model.prompt(full_prompt)
             response_text = extract_palindrome(response.text()).strip().lower()
             # Note: response_json is only populated after .text() consumes the stream
-            metadata = response.response_json or {}
+            response_json = response.response_json or {}
 
             end_time = time.time()
             duration = end_time - start_time
@@ -112,10 +112,11 @@ def main() -> None:
             input_tokens = response.input_tokens or 0
             output_tokens = response.output_tokens or 0
             cost, cost_source = get_request_cost(
-                model_name, input_tokens, output_tokens, metadata
+                model_name, input_tokens, output_tokens, response_json
             )
 
-            # Add cost and token counts to metadata for logging
+            # Build metadata with only the needed fields
+            metadata = {}
             if input_tokens:
                 metadata["input_tokens"] = input_tokens
             if output_tokens:

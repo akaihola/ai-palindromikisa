@@ -63,9 +63,20 @@ def extract_cost_from_metadata(metadata: dict) -> float | None:
     Extract cost from OpenRouter metadata if available.
 
     OpenRouter includes 'cost' field inside the 'usage' object.
+    For BYOK (Bring Your Own Key) models, 'cost' is 0 and the actual cost
+    is in 'cost_details.upstream_inference_cost'.
     """
     usage = metadata.get("usage", {})
-    return usage.get("cost")
+    cost = usage.get("cost")
+
+    # For BYOK models, cost is 0 but upstream_inference_cost has the actual value
+    if cost == 0:
+        cost_details = usage.get("cost_details", {})
+        upstream_cost = cost_details.get("upstream_inference_cost")
+        if upstream_cost is not None:
+            return upstream_cost
+
+    return cost
 
 
 def get_request_cost(
