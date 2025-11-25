@@ -83,6 +83,23 @@ def save_log(log_path, log_data):
 
     yaml_obj.representer.add_representer(str, represent_str)
 
+    # Custom representer for floats to avoid scientific notation
+    def represent_float(representer, value):
+        if value != value:  # NaN
+            return representer.represent_scalar("tag:yaml.org,2002:float", ".nan")
+        elif value == float("inf"):
+            return representer.represent_scalar("tag:yaml.org,2002:float", ".inf")
+        elif value == float("-inf"):
+            return representer.represent_scalar("tag:yaml.org,2002:float", "-.inf")
+        else:
+            # Format to avoid scientific notation, up to 10 decimal places
+            formatted = f"{value:.10f}".rstrip("0").rstrip(".")
+            if "." not in formatted:
+                formatted += ".0"
+            return representer.represent_scalar("tag:yaml.org,2002:float", formatted)
+
+    yaml_obj.representer.add_representer(float, represent_float)
+
     # Convert to string and write using Path
     string_stream = StringIO()
     yaml_obj.dump(log_data, string_stream)

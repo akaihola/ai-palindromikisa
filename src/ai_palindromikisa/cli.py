@@ -4,7 +4,7 @@ import sys
 from ai_palindromikisa.models import get_all_tested_models
 
 
-def parse_cli_arguments() -> list[str]:
+def parse_cli_arguments() -> tuple[list[str], int | None]:
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="Run palindrome benchmark tasks")
     parser.add_argument(
@@ -16,6 +16,13 @@ def parse_cli_arguments() -> list[str]:
             "Model to use for the benchmark "
             "(can be specified multiple times, or use ALL for all tested models)"
         ),
+    )
+    parser.add_argument(
+        "-l",
+        "--limit",
+        type=int,
+        default=None,
+        help="Limit the number of tasks to run per model",
     )
     args = parser.parse_args()
 
@@ -34,4 +41,4 @@ def parse_cli_arguments() -> list[str]:
     else:
         # Use explicitly specified models
         models = args.models
-    return models
+    return models, args.limit

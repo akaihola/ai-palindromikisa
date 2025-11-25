@@ -14,6 +14,7 @@ dependencies = [
     "llm-gemini",
     "llm-openrouter",
     "ruamel-yaml>=0.18.16",
+    "requests",
 ]
 
 [dependency-groups]

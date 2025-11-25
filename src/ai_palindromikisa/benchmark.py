@@ -7,12 +7,14 @@ from datetime import datetime, timezone
 import llm
 
 from ai_palindromikisa.cli import parse_cli_arguments
+from ai_palindromikisa.formatting import format_price_for_console
 from ai_palindromikisa.logs import (
     get_completed_tasks,
     get_existing_logs,
     save_task_result,
 )
 from ai_palindromikisa.models import ensure_model_metadata_exists
+from ai_palindromikisa.pricing import get_request_cost
 from ai_palindromikisa.scores import show_scores
 from ai_palindromikisa.tasks import load_tasks
 
@@ -39,7 +41,7 @@ def normalize_text(text):
 
 
 def main() -> None:
-    models: list[str] = parse_cli_arguments()
+    models, limit = parse_cli_arguments()
     print(f"Running benchmark for models: {', '.join(models)}\n")
 
     system_prompt, tasks = load_tasks()
@@ -71,6 +73,10 @@ def main() -> None:
             # Model metadata file has already been created earlier in the loop
             continue
 
+        # Apply limit if specified
+        if limit is not None:
+            tasks_to_run = tasks_to_run[:limit]
+
         print(f"Running {len(tasks_to_run)} new tasks...\n")
 
         total_tasks_run = len(tasks_to_run)
@@ -101,6 +107,18 @@ def main() -> None:
             end_time = time.time()
             duration = end_time - start_time
 
+            # Get token counts from the response object (llm library stores them here)
+            input_tokens = response.input_tokens or 0
+            output_tokens = response.output_tokens or 0
+            cost, cost_source = get_request_cost(
+                model_name, input_tokens, output_tokens, metadata
+            )
+
+            # Add cost to metadata for logging
+            if cost is not None:
+                metadata["cost_usd"] = cost
+                metadata["cost_source"] = cost_source
+
             # Compare normalized text (ignoring punctuation)
             normalized_response = normalize_text(response_text)
             normalized_reference = normalize_text(reference)
@@ -123,7 +141,9 @@ def main() -> None:
 
             print(f"Response: {response_text}")
             print(f"Match: {'Yes' if is_correct else 'No'}")
-            print(f"Duration: {duration:.2f}s\n")
+            print(f"Duration: {duration:.2f}s")
+            print(f"Cost: {format_price_for_console(cost, cost_source)}")
+            print()
 
         show_scores(correct, total_tasks_run, completed_prompts, existing_logs)
 
