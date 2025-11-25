@@ -1,12 +1,13 @@
 """Tests for benchmark logging functionality."""
 
-import tempfile
 from pathlib import Path
 from typing import cast
+from unittest import mock
 
 import pytest
 import yaml
 
+import ai_palindromikisa.logs
 from ai_palindromikisa.logs import save_task_result
 
 
@@ -21,24 +22,6 @@ Luo tai täydennä pyydetynlainen palindromi.
 Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
 Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
 {prompt}"""
-
-    @pytest.fixture
-    def mock_tasks(self):
-        """Mock tasks for testing."""
-        return [
-            {
-                "id": "test_1",
-                "prompt": "Test prompt 1",
-                "type": "generate",
-                "reference": "test1",
-            },
-            {
-                "id": "test_2",
-                "prompt": "Test prompt 2",
-                "type": "complete",
-                "reference": "test2",
-            },
-        ]
 
     @pytest.fixture
     def mock_results(self):
@@ -59,266 +42,217 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
         ]
 
     def test_create_log_file_integration(
-        self, mock_system_prompt, mock_tasks, mock_results
+        self, tmp_path: Path, mock_system_prompt, mock_results
     ):
         """Test log file creation with real file system operations."""
         model_name = "test/test-model"
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = Path(temp_dir)
+        # Create a temporary benchmark.py file in the expected location
+        src_dir = tmp_path / "src" / "ai_palindromikisa"
+        src_dir.mkdir(parents=True, exist_ok=True)
+        benchmark_file = src_dir / "benchmark.py"
+        benchmark_file.write_text("# dummy file")
 
-            # Create a temporary benchmark.py file in the expected location
-            src_dir = temp_path / "src" / "ai_palindromikisa"
-            src_dir.mkdir(parents=True, exist_ok=True)
-            benchmark_file = src_dir / "benchmark.py"
-            benchmark_file.write_text("# dummy file")
-
-            # Patch the __file__ path to use our temp directory
-            import ai_palindromikisa.logs
-
-            original_file = ai_palindromikisa.logs.__file__
-            ai_palindromikisa.logs.__file__ = str(benchmark_file)
-
-            try:
-                # Create the log file
-                log_path = save_task_result(
+        # Patch the __file__ path to use our temp directory
+        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(benchmark_file)):
+            # Create the log file
+            log_path = save_task_result(
+                model_name,
+                mock_system_prompt,
+                mock_results[0]["prompt"],
+                mock_results[0]["answer"],
+                mock_results[0]["is_correct"],
+                mock_results[0]["duration_seconds"],
+            )
+            assert (
+                save_task_result(
                     model_name,
                     mock_system_prompt,
-                    mock_results[0]["prompt"],
-                    mock_results[0]["answer"],
-                    mock_results[0]["is_correct"],
-                    mock_results[0]["duration_seconds"],
+                    mock_results[1]["prompt"],
+                    mock_results[1]["answer"],
+                    mock_results[1]["is_correct"],
+                    mock_results[1]["duration_seconds"],
                 )
-                assert (
-                    save_task_result(
-                        model_name,
-                        mock_system_prompt,
-                        mock_results[1]["prompt"],
-                        mock_results[1]["answer"],
-                        mock_results[1]["is_correct"],
-                        mock_results[1]["duration_seconds"],
-                    )
-                    == log_path
-                )
+                == log_path
+            )
 
-                # Verify file was created
-                assert log_path.exists()
+            # Verify file was created
+            assert log_path.exists()
 
-                # Load and verify the YAML content
-                data = cast(
-                    "dict", yaml.safe_load(log_path.read_text(encoding="utf-8"))
-                )
+            # Load and verify the YAML content
+            data = cast("dict", yaml.safe_load(log_path.read_text(encoding="utf-8")))
 
-                # Verify required top-level fields
-                assert "date" in data
-                assert "model" in data
-                assert "prompt_template" in data
-                assert "tasks" in data
+            # Verify required top-level fields
+            assert "date" in data
+            assert "model" in data
+            assert "prompt_template" in data
+            assert "tasks" in data
 
-                # Verify date format (YYYY-MM-DD)
-                date_str = data["date"]
-                assert len(date_str) == 10
-                assert date_str[4] == "-" and date_str[7] == "-"
+            # Verify date format (YYYY-MM-DD)
+            date_str = data["date"]
+            assert len(date_str) == 10
+            assert date_str[4] == "-" and date_str[7] == "-"
 
-                # Verify model path format
-                assert data["model"] == "models/test-test-model-1.yaml"
+            # Verify model path format
+            assert data["model"] == "models/test-test-model-1.yaml"
 
-                # Verify prompt template contains system prompt and placeholder
-                assert mock_system_prompt in data["prompt_template"]
-                assert "{prompt}" in data["prompt_template"]
+            # Verify prompt template contains system prompt and placeholder
+            assert mock_system_prompt in data["prompt_template"]
+            assert "{prompt}" in data["prompt_template"]
 
-                # Verify tasks structure
-                tasks = data["tasks"]
-                assert len(tasks) == 2
+            # Verify tasks structure
+            tasks = data["tasks"]
+            assert len(tasks) == 2
 
-                for i, task in enumerate(tasks):
-                    assert "prompt" in task
-                    assert "answer" in task
-                    assert "is_correct" in task
-                    assert "duration_seconds" in task
+            for i, task in enumerate(tasks):
+                assert "prompt" in task
+                assert "answer" in task
+                assert "is_correct" in task
+                assert "duration_seconds" in task
 
-                    # Verify specific task data
-                    assert task["prompt"] == mock_results[i]["prompt"]
-                    assert task["answer"] == mock_results[i]["answer"]
-                    assert task["is_correct"] == mock_results[i]["is_correct"]
-                    assert (
-                        task["duration_seconds"] == mock_results[i]["duration_seconds"]
-                    )
+                # Verify specific task data
+                assert task["prompt"] == mock_results[i]["prompt"]
+                assert task["answer"] == mock_results[i]["answer"]
+                assert task["is_correct"] == mock_results[i]["is_correct"]
+                assert task["duration_seconds"] == mock_results[i]["duration_seconds"]
 
-                    # Verify data types
-                    assert isinstance(task["prompt"], str)
-                    assert isinstance(task["answer"], str)
-                    assert isinstance(task["is_correct"], bool)
-                    assert isinstance(task["duration_seconds"], (int, float))
+                # Verify data types
+                assert isinstance(task["prompt"], str)
+                assert isinstance(task["answer"], str)
+                assert isinstance(task["is_correct"], bool)
+                assert isinstance(task["duration_seconds"], (int, float))
 
-                # Verify directory structure
-                assert log_path.parent.name == "benchmark_logs"
-                assert log_path.parent.parent == temp_path
+            # Verify directory structure
+            assert log_path.parent.name == "benchmark_logs"
+            assert log_path.parent.parent == tmp_path
 
-            finally:
-                # Restore original __file__
-                ai_palindromikisa.logs.__file__ = original_file
-
-    def test_model_name_conversion(self, mock_system_prompt, mock_tasks, mock_results):
+    def test_model_name_conversion(
+        self, tmp_path: Path, mock_system_prompt, mock_results
+    ):
         """Test that model names with slashes are properly converted to dashes."""
         model_name = "gemini/gemini-2.0-flash"
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = Path(temp_dir)
+        # Create temporary benchmark.py
+        src_dir = tmp_path / "src" / "ai_palindromikisa"
+        src_dir.mkdir(parents=True, exist_ok=True)
+        benchmark_file = src_dir / "benchmark.py"
+        benchmark_file.write_text("# dummy file")
 
-            # Create temporary benchmark.py
-            src_dir = temp_path / "src" / "ai_palindromikisa"
-            src_dir.mkdir(parents=True, exist_ok=True)
-            benchmark_file = src_dir / "benchmark.py"
-            benchmark_file.write_text("# dummy file")
-
-            import ai_palindromikisa.logs
-
-            original_file = ai_palindromikisa.logs.__file__
-            ai_palindromikisa.logs.__file__ = str(benchmark_file)
-
-            try:
-                # Create the log file
-                log_path = save_task_result(
+        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(benchmark_file)):
+            # Create the log file
+            log_path = save_task_result(
+                model_name,
+                mock_system_prompt,
+                mock_results[0]["prompt"],
+                mock_results[0]["answer"],
+                mock_results[0]["is_correct"],
+                mock_results[0]["duration_seconds"],
+            )
+            assert (
+                save_task_result(
                     model_name,
                     mock_system_prompt,
-                    mock_results[0]["prompt"],
-                    mock_results[0]["answer"],
-                    mock_results[0]["is_correct"],
-                    mock_results[0]["duration_seconds"],
+                    mock_results[1]["prompt"],
+                    mock_results[1]["answer"],
+                    mock_results[1]["is_correct"],
+                    mock_results[1]["duration_seconds"],
                 )
-                assert (
-                    save_task_result(
-                        model_name,
-                        mock_system_prompt,
-                        mock_results[1]["prompt"],
-                        mock_results[1]["answer"],
-                        mock_results[1]["is_correct"],
-                        mock_results[1]["duration_seconds"],
-                    )
-                    == log_path
-                )
+                == log_path
+            )
 
-                data = cast(
-                    "dict", yaml.safe_load(log_path.read_text(encoding="utf-8"))
-                )
+            data = cast("dict", yaml.safe_load(log_path.read_text(encoding="utf-8")))
 
-                # Verify model path conversion
-                assert data["model"] == "models/gemini-gemini-2.0-flash-1.yaml"
+            # Verify model path conversion
+            assert data["model"] == "models/gemini-gemini-2.0-flash-1.yaml"
 
-                # Verify filename conversion
-                assert "gemini-gemini-2.0-flash" in log_path.name
+            # Verify filename conversion
+            assert "gemini-gemini-2.0-flash" in log_path.name
 
-            finally:
-                ai_palindromikisa.logs.__file__ = original_file
-
-    def test_directory_creation(self, mock_system_prompt, mock_tasks, mock_results):
+    def test_directory_creation(self, tmp_path: Path, mock_system_prompt, mock_results):
         """Test that the benchmark_logs directory is created if it doesn't exist."""
         model_name = "test/model"
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = Path(temp_dir)
+        # Create temporary benchmark.py
+        src_dir = tmp_path / "src" / "ai_palindromikisa"
+        src_dir.mkdir(parents=True, exist_ok=True)
+        benchmark_file = src_dir / "benchmark.py"
+        benchmark_file.write_text("# dummy file")
 
-            # Create temporary benchmark.py
-            src_dir = temp_path / "src" / "ai_palindromikisa"
-            src_dir.mkdir(parents=True, exist_ok=True)
-            benchmark_file = src_dir / "benchmark.py"
-            benchmark_file.write_text("# dummy file")
+        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(benchmark_file)):
+            # Don't create benchmark_logs directory beforehand
+            benchmark_logs_dir = tmp_path / "benchmark_logs"
+            assert not benchmark_logs_dir.exists()
 
-            import ai_palindromikisa.logs
-
-            original_file = ai_palindromikisa.logs.__file__
-            ai_palindromikisa.logs.__file__ = str(benchmark_file)
-
-            try:
-                # Don't create benchmark_logs directory beforehand
-                benchmark_logs_dir = temp_path / "benchmark_logs"
-                assert not benchmark_logs_dir.exists()
-
-                # Create the log file
-                log_path = save_task_result(
+            # Create the log file
+            log_path = save_task_result(
+                model_name,
+                mock_system_prompt,
+                mock_results[0]["prompt"],
+                mock_results[0]["answer"],
+                mock_results[0]["is_correct"],
+                mock_results[0]["duration_seconds"],
+            )
+            assert (
+                save_task_result(
                     model_name,
                     mock_system_prompt,
-                    mock_results[0]["prompt"],
-                    mock_results[0]["answer"],
-                    mock_results[0]["is_correct"],
-                    mock_results[0]["duration_seconds"],
+                    mock_results[1]["prompt"],
+                    mock_results[1]["answer"],
+                    mock_results[1]["is_correct"],
+                    mock_results[1]["duration_seconds"],
                 )
-                assert (
-                    save_task_result(
-                        model_name,
-                        mock_system_prompt,
-                        mock_results[1]["prompt"],
-                        mock_results[1]["answer"],
-                        mock_results[1]["is_correct"],
-                        mock_results[1]["duration_seconds"],
-                    )
-                    == log_path
-                )
+                == log_path
+            )
 
-                # Verify directory was created
-                assert benchmark_logs_dir.exists()
-                assert benchmark_logs_dir.is_dir()
+            # Verify directory was created
+            assert benchmark_logs_dir.exists()
+            assert benchmark_logs_dir.is_dir()
 
-                # Verify file was created in the directory
-                assert log_path.parent == benchmark_logs_dir
-                assert log_path.exists()
+            # Verify file was created in the directory
+            assert log_path.parent == benchmark_logs_dir
+            assert log_path.exists()
 
-            finally:
-                ai_palindromikisa.logs.__file__ = original_file
-
-    def test_filename_format(self, mock_system_prompt, mock_tasks, mock_results):
+    def test_filename_format(self, tmp_path: Path, mock_system_prompt, mock_results):
         """Test that log filename follows the expected format."""
         model_name = "test/test-model"
 
-        with tempfile.TemporaryDirectory() as temp_dir:
-            temp_path = Path(temp_dir)
+        # Create temporary benchmark.py
+        src_dir = tmp_path / "src" / "ai_palindromikisa"
+        src_dir.mkdir(parents=True, exist_ok=True)
+        benchmark_file = src_dir / "benchmark.py"
+        benchmark_file.write_text("# dummy file")
 
-            # Create temporary benchmark.py
-            src_dir = temp_path / "src" / "ai_palindromikisa"
-            src_dir.mkdir(parents=True, exist_ok=True)
-            benchmark_file = src_dir / "benchmark.py"
-            benchmark_file.write_text("# dummy file")
-
-            import ai_palindromikisa.logs
-
-            original_file = ai_palindromikisa.logs.__file__
-            ai_palindromikisa.logs.__file__ = str(benchmark_file)
-
-            try:
-                # Create the log file
-                log_path = save_task_result(
+        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(benchmark_file)):
+            # Create the log file
+            log_path = save_task_result(
+                model_name,
+                mock_system_prompt,
+                mock_results[0]["prompt"],
+                mock_results[0]["answer"],
+                mock_results[0]["is_correct"],
+                mock_results[0]["duration_seconds"],
+            )
+            assert (
+                save_task_result(
                     model_name,
                     mock_system_prompt,
-                    mock_results[0]["prompt"],
-                    mock_results[0]["answer"],
-                    mock_results[0]["is_correct"],
-                    mock_results[0]["duration_seconds"],
+                    mock_results[1]["prompt"],
+                    mock_results[1]["answer"],
+                    mock_results[1]["is_correct"],
+                    mock_results[1]["duration_seconds"],
                 )
-                assert (
-                    save_task_result(
-                        model_name,
-                        mock_system_prompt,
-                        mock_results[1]["prompt"],
-                        mock_results[1]["answer"],
-                        mock_results[1]["is_correct"],
-                        mock_results[1]["duration_seconds"],
-                    )
-                    == log_path
-                )
+                == log_path
+            )
 
-                # Verify filename format: YYYY-MM-DD-model-name.yaml
-                filename = log_path.name
-                assert filename.endswith(".yaml")
+            # Verify filename format: YYYY-MM-DD-model-name.yaml
+            filename = log_path.name
+            assert filename.endswith(".yaml")
 
-                # Extract date part (first 10 characters should be YYYY-MM-DD)
-                date_part = filename[:10]
-                assert len(date_part) == 10
-                assert date_part[4] == "-" and date_part[7] == "-"
+            # Extract date part (first 10 characters should be YYYY-MM-DD)
+            date_part = filename[:10]
+            assert len(date_part) == 10
+            assert date_part[4] == "-" and date_part[7] == "-"
 
-                # Verify model name part (after date, before .yaml)
-                model_part = filename[11:-5]  # Remove date and .yaml
-                assert model_part == "test-test-model"
-
-            finally:
-                ai_palindromikisa.logs.__file__ = original_file
+            # Verify model name part (after date, before .yaml)
+            model_part = filename[11:-5]  # Remove date and .yaml
+            assert model_part == "test-test-model"
