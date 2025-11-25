@@ -63,6 +63,8 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
                 mock_results[0]["answer"],
                 mock_results[0]["is_correct"],
                 mock_results[0]["duration_seconds"],
+                timestamp="2025-01-01T12:00:00Z",
+                metadata={},
             )
             assert (
                 save_task_result(
@@ -72,6 +74,8 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
                     mock_results[1]["answer"],
                     mock_results[1]["is_correct"],
                     mock_results[1]["duration_seconds"],
+                    timestamp="2025-01-01T12:00:01Z",
+                    metadata={"test_key": "test_value"},
                 )
                 == log_path
             )
@@ -147,6 +151,8 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
                 mock_results[0]["answer"],
                 mock_results[0]["is_correct"],
                 mock_results[0]["duration_seconds"],
+                timestamp="2025-01-01T12:00:00Z",
+                metadata={},
             )
             assert (
                 save_task_result(
@@ -156,6 +162,8 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
                     mock_results[1]["answer"],
                     mock_results[1]["is_correct"],
                     mock_results[1]["duration_seconds"],
+                    timestamp="2025-01-01T12:00:01Z",
+                    metadata={},
                 )
                 == log_path
             )
@@ -191,6 +199,8 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
                 mock_results[0]["answer"],
                 mock_results[0]["is_correct"],
                 mock_results[0]["duration_seconds"],
+                timestamp="2025-01-01T12:00:00Z",
+                metadata={},
             )
             assert (
                 save_task_result(
@@ -200,6 +210,8 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
                     mock_results[1]["answer"],
                     mock_results[1]["is_correct"],
                     mock_results[1]["duration_seconds"],
+                    timestamp="2025-01-01T12:00:01Z",
+                    metadata={},
                 )
                 == log_path
             )
@@ -231,6 +243,8 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
                 mock_results[0]["answer"],
                 mock_results[0]["is_correct"],
                 mock_results[0]["duration_seconds"],
+                timestamp="2025-01-01T12:00:00Z",
+                metadata={},
             )
             assert (
                 save_task_result(
@@ -240,6 +254,8 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
                     mock_results[1]["answer"],
                     mock_results[1]["is_correct"],
                     mock_results[1]["duration_seconds"],
+                    timestamp="2025-01-01T12:00:01Z",
+                    metadata={},
                 )
                 == log_path
             )

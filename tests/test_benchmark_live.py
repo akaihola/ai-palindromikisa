@@ -166,8 +166,9 @@ VASTAUS:"""
             assert isinstance(task_timestamp, str), "timestamp should be a string"
             # Parse timestamp to validate format
             parsed_ts = datetime.fromisoformat(task_timestamp.replace("Z", "+00:00"))
-            assert (
-                parsed_ts >= timestamp_before
+            # Compare at second precision since timestamp format truncates microseconds
+            assert parsed_ts >= timestamp_before.replace(
+                microsecond=0
             ), "timestamp should be after request start"
             assert parsed_ts <= timestamp_after.replace(microsecond=0) + __import__(
                 "datetime"

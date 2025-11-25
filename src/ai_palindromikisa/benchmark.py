@@ -2,6 +2,7 @@
 
 import re
 import time
+from datetime import datetime, timezone
 
 import llm
 
@@ -88,11 +89,13 @@ def main() -> None:
 
             # Time the task execution
             start_time = time.time()
+            timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
             print(f"Prompt: {task['prompt']}")
             print(f"Reference: {reference}")
 
             response = model.prompt(full_prompt)
+            metadata = response.response_json or {}
             response_text = extract_palindrome(response.text()).strip().lower()
 
             end_time = time.time()
@@ -114,6 +117,8 @@ def main() -> None:
                 response_text,
                 is_correct,
                 duration,
+                timestamp,
+                metadata,
             )
 
             print(f"Response: {response_text}")

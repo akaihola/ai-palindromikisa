@@ -112,6 +112,8 @@ def save_task_result(
     response_text: str,
     is_correct: bool,
     duration: float,
+    timestamp: str,
+    metadata: dict,
 ) -> Path:
     """Save a single task result to the log file."""
     log_path = get_log_path(model_name)
@@ -132,10 +134,12 @@ def save_task_result(
     # Append the new task result
     existing_data["tasks"].append(
         {
+            "timestamp": timestamp,
             "prompt": prompt,
             "answer": response_text,
             "is_correct": is_correct,
             "duration_seconds": round(duration, 2),
+            "metadata": metadata,
         }
     )
 
