@@ -114,7 +114,11 @@ def main() -> None:
                 model_name, input_tokens, output_tokens, metadata
             )
 
-            # Add cost to metadata for logging
+            # Add cost and token counts to metadata for logging
+            if input_tokens:
+                metadata["input_tokens"] = input_tokens
+            if output_tokens:
+                metadata["output_tokens"] = output_tokens
             if cost is not None:
                 metadata["cost_usd"] = cost
                 metadata["cost_source"] = cost_source

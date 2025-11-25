@@ -62,9 +62,10 @@ def extract_cost_from_metadata(metadata: dict) -> float | None:
     """
     Extract cost from OpenRouter metadata if available.
 
-    OpenRouter includes 'cost' field in the metadata.
+    OpenRouter includes 'cost' field inside the 'usage' object.
     """
-    return metadata.get("cost")
+    usage = metadata.get("usage", {})
+    return usage.get("cost")
 
 
 def get_request_cost(
