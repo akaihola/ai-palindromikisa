@@ -19,7 +19,8 @@ class TestCreateLogFileIntegration:
         return """Olet erinomainen palindromien kirjoittaja.
 Luo tai täydennä pyydetynlainen palindromi.
 Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
-Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
+Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+{prompt}"""
 
     @pytest.fixture
     def mock_tasks(self):
@@ -73,10 +74,10 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
             benchmark_file.write_text("# dummy file")
 
             # Patch the __file__ path to use our temp directory
-            import ai_palindromikisa.benchmark
+            import ai_palindromikisa.logs
 
-            original_file = ai_palindromikisa.benchmark.__file__
-            ai_palindromikisa.benchmark.__file__ = str(benchmark_file)
+            original_file = ai_palindromikisa.logs.__file__
+            ai_palindromikisa.logs.__file__ = str(benchmark_file)
 
             try:
                 # Create the log file
@@ -156,7 +157,7 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
 
             finally:
                 # Restore original __file__
-                ai_palindromikisa.benchmark.__file__ = original_file
+                ai_palindromikisa.logs.__file__ = original_file
 
     def test_model_name_conversion(self, mock_system_prompt, mock_tasks, mock_results):
         """Test that model names with slashes are properly converted to dashes."""
@@ -171,10 +172,10 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
             benchmark_file = src_dir / "benchmark.py"
             benchmark_file.write_text("# dummy file")
 
-            import ai_palindromikisa.benchmark
+            import ai_palindromikisa.logs
 
-            original_file = ai_palindromikisa.benchmark.__file__
-            ai_palindromikisa.benchmark.__file__ = str(benchmark_file)
+            original_file = ai_palindromikisa.logs.__file__
+            ai_palindromikisa.logs.__file__ = str(benchmark_file)
 
             try:
                 # Create the log file
@@ -209,7 +210,7 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
                 assert "gemini-gemini-2.0-flash" in log_path.name
 
             finally:
-                ai_palindromikisa.benchmark.__file__ = original_file
+                ai_palindromikisa.logs.__file__ = original_file
 
     def test_directory_creation(self, mock_system_prompt, mock_tasks, mock_results):
         """Test that the benchmark_logs directory is created if it doesn't exist."""
@@ -224,10 +225,10 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
             benchmark_file = src_dir / "benchmark.py"
             benchmark_file.write_text("# dummy file")
 
-            import ai_palindromikisa.benchmark
+            import ai_palindromikisa.logs
 
-            original_file = ai_palindromikisa.benchmark.__file__
-            ai_palindromikisa.benchmark.__file__ = str(benchmark_file)
+            original_file = ai_palindromikisa.logs.__file__
+            ai_palindromikisa.logs.__file__ = str(benchmark_file)
 
             try:
                 # Don't create benchmark_logs directory beforehand
@@ -264,7 +265,7 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
                 assert log_path.exists()
 
             finally:
-                ai_palindromikisa.benchmark.__file__ = original_file
+                ai_palindromikisa.logs.__file__ = original_file
 
     def test_filename_format(self, mock_system_prompt, mock_tasks, mock_results):
         """Test that log filename follows the expected format."""
@@ -279,10 +280,10 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
             benchmark_file = src_dir / "benchmark.py"
             benchmark_file.write_text("# dummy file")
 
-            import ai_palindromikisa.benchmark
+            import ai_palindromikisa.logs
 
-            original_file = ai_palindromikisa.benchmark.__file__
-            ai_palindromikisa.benchmark.__file__ = str(benchmark_file)
+            original_file = ai_palindromikisa.logs.__file__
+            ai_palindromikisa.logs.__file__ = str(benchmark_file)
 
             try:
                 # Create the log file
@@ -320,4 +321,4 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>."""
                 assert model_part == "test-test-model"
 
             finally:
-                ai_palindromikisa.benchmark.__file__ = original_file
+                ai_palindromikisa.logs.__file__ = original_file
