@@ -1,0 +1,131 @@
+date: '2025-11-25'
+model: models/anthropic-claude-haiku-4-5-20251001-1.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  {prompt}
+  VASTAUS:
+tasks:
+  - timestamp: '2025-11-25T20:40:35Z'
+    prompt: Suomalainen kaksikirjaiminen paikannimi
+    answer: oo
+    is_correct: false
+    duration_seconds: 2.3
+    metadata:
+      input_tokens: 247
+      output_tokens: 72
+      cost_usd: 0.000607
+      cost_source: litellm
+  - timestamp: '2025-11-25T20:48:11Z'
+    prompt: Kolmekirjaiminen sana, käytä vain kirjaimia T ja U
+    answer: tut
+    is_correct: false
+    duration_seconds: 2.23
+    metadata:
+      input_tokens: 255
+      output_tokens: 17
+      cost_usd: 0.00034
+      cost_source: litellm
+  - timestamp: '2025-11-25T20:49:21Z'
+    prompt: Nelikirjaiminen sana, käytä vain kirjaimia Y ja S
+    answer: syys
+    is_correct: true
+    duration_seconds: 1.55
+    metadata:
+      input_tokens: 255
+      output_tokens: 18
+      cost_usd: 0.000345
+      cost_source: litellm
+  - timestamp: '2025-11-25T20:50:47Z'
+    prompt: Viisikirjaiminen sana, kuvaa henkilöä joka ajaa
+    answer: kuljettaja ajaa kuljettaja
+    is_correct: false
+    duration_seconds: 4.05
+    metadata:
+      input_tokens: 254
+      output_tokens: 305
+      cost_usd: 0.001779
+      cost_source: litellm
+  - timestamp: '2025-11-25T20:53:27Z'
+    prompt: Järjestyslukusana kirjaimin kirjoitettuna
+    answer: kolmetoista - aittaemo lk
+    is_correct: false
+    duration_seconds: 4.39
+    metadata:
+      input_tokens: 249
+      output_tokens: 197
+      cost_usd: 0.001234
+      cost_source: litellm
+  - timestamp: '2025-11-25T21:01:50Z'
+    prompt: >-
+      Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
+    answer: sakari rakkain, naikin arkaksin sakari.
+    is_correct: false
+    duration_seconds: 1.42
+    metadata:
+      input_tokens: 263
+      output_tokens: 31
+      cost_usd: 0.000418
+      cost_source: litellm
+  - timestamp: '2025-11-25T21:17:46Z'
+    prompt: Lause sanoista "pyhä", "iso", "hypnoosi" ja "on"
+    answer: pyhä iso hypnoosi on on hypnoosi iso pyhä.
+    is_correct: false
+    duration_seconds: 1.69
+    metadata:
+      input_tokens: 256
+      output_tokens: 32
+      cost_usd: 0.000416
+      cost_source: litellm
+  - timestamp: '2025-11-25T21:31:50Z'
+    prompt: 'Täydennä puuttuva kirjain: Assi _okaa kodissa.'
+    answer: assi rokaa kodissa.
+    is_correct: false
+    duration_seconds: 4.59
+    metadata:
+      input_tokens: 255
+      output_tokens: 246
+      cost_usd: 0.001485
+      cost_source: litellm
+  - timestamp: '2025-11-25T21:35:00Z'
+    prompt: 'Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!'
+    answer: sanni katso, isä, siis ota ossakat innas.
+    is_correct: false
+    duration_seconds: 3.11
+    metadata:
+      input_tokens: 264
+      output_tokens: 34
+      cost_usd: 0.000434
+      cost_source: litellm
+  - timestamp: '2025-11-25T21:45:17Z'
+    prompt: Lause, jossa sekä tavit että sudet edustivat
+    answer: sudet tavit, tavit sudet.
+    is_correct: false
+    duration_seconds: 1.48
+    metadata:
+      input_tokens: 250
+      output_tokens: 25
+      cost_usd: 0.000375
+      cost_source: litellm
+  - timestamp: '2025-11-25T21:54:03Z'
+    prompt: "Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _."
+    answer: isoja hajuja aja jah ajos i.
+    is_correct: false
+    duration_seconds: 2.06
+    metadata:
+      input_tokens: 254
+      output_tokens: 27
+      cost_usd: 0.000389
+      cost_source: litellm

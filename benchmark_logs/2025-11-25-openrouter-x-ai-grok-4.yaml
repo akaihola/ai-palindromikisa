@@ -1,0 +1,121 @@
+date: '2025-11-25'
+model: models/openrouter-x-ai-grok-4-1.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  {prompt}
+  VASTAUS:
+tasks:
+  - timestamp: '2025-11-25T20:42:08Z'
+    prompt: Suomalainen kaksikirjaiminen paikannimi
+    answer: ii
+    is_correct: true
+    duration_seconds: 25.45
+    metadata:
+      input_tokens: 881
+      output_tokens: 805
+      cost_usd: 0.01319025
+      cost_source: openrouter
+  - timestamp: '2025-11-25T20:48:40Z'
+    prompt: Kolmekirjaiminen sana, käytä vain kirjaimia T ja U
+    answer: utu
+    is_correct: true
+    duration_seconds: 28.89
+    metadata:
+      input_tokens: 886
+      output_tokens: 766
+      cost_usd: 0.01262025
+      cost_source: openrouter
+  - timestamp: '2025-11-25T20:49:52Z'
+    prompt: Nelikirjaiminen sana, käytä vain kirjaimia Y ja S
+    answer: syys
+    is_correct: true
+    duration_seconds: 45.5
+    metadata:
+      input_tokens: 885
+      output_tokens: 1332
+      cost_usd: 0.02110725
+      cost_source: openrouter
+  - timestamp: '2025-11-25T20:52:31Z'
+    prompt: Viisikirjaiminen sana, kuvaa henkilöä joka ajaa
+    answer: ajaja
+    is_correct: true
+    duration_seconds: 16.36
+    metadata:
+      input_tokens: 884
+      output_tokens: 497
+      cost_usd: 0.00857925
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:00:05Z'
+    prompt: Järjestyslukusana kirjaimin kirjoitettuna
+    answer: sadas
+    is_correct: true
+    duration_seconds: 71.54
+    metadata:
+      input_tokens: 881
+      output_tokens: 1801
+      cost_usd: 0.02813025
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:16:31Z'
+    prompt: >-
+      Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
+    answer: sakari rakas
+    is_correct: true
+    duration_seconds: 61.88
+    metadata:
+      input_tokens: 892
+      output_tokens: 1813
+      cost_usd: 0.02834325
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:24:56Z'
+    prompt: Lause sanoista "pyhä", "iso", "hypnoosi" ja "on"
+    answer: ähypnoosi iso on pyhä.
+    is_correct: false
+    duration_seconds: 388.6
+    metadata:
+      input_tokens: 888
+      output_tokens: 13415
+      cost_usd: 0.20236125
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:32:57Z'
+    prompt: 'Täydennä puuttuva kirjain: Assi _okaa kodissa.'
+    answer: assi dokaa kodissa.
+    is_correct: true
+    duration_seconds: 96.44
+    metadata:
+      input_tokens: 887
+      output_tokens: 2756
+      cost_usd: 0.04247325
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:43:19Z'
+    prompt: 'Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!'
+    answer: sanni katosi, isä, siis ota kinnas!
+    is_correct: true
+    duration_seconds: 90.38
+    metadata:
+      input_tokens: 893
+      output_tokens: 3224
+      cost_usd: 0.04909275
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:51:54Z'
+    prompt: "Lause, jossa sekä tavit että sudet edustivat"
+    answer: tavit, sudet edustivat.
+    is_correct: true
+    duration_seconds: 99.59
+    metadata:
+      input_tokens: 882
+      output_tokens: 3140
+      cost_usd: 0.04821825
+      cost_source: openrouter

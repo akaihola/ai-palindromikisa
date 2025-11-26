@@ -1,0 +1,131 @@
+date: '2025-11-25'
+model: models/openrouter-openai-gpt-5.1-1.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  {prompt}
+  VASTAUS:
+tasks:
+  - timestamp: '2025-11-25T20:42:00Z'
+    prompt: Suomalainen kaksikirjaiminen paikannimi
+    answer: '"ii"'
+    is_correct: true
+    duration_seconds: 8.4
+    metadata:
+      input_tokens: 203
+      output_tokens: 124
+      cost_usd: 0.00149375
+      cost_source: openrouter
+  - timestamp: '2025-11-25T20:48:35Z'
+    prompt: Kolmekirjaiminen sana, käytä vain kirjaimia T ja U
+    answer: tut
+    is_correct: false
+    duration_seconds: 5.17
+    metadata:
+      input_tokens: 209
+      output_tokens: 129
+      cost_usd: 0.00155125
+      cost_source: openrouter
+  - timestamp: '2025-11-25T20:49:48Z'
+    prompt: Nelikirjaiminen sana, käytä vain kirjaimia Y ja S
+    answer: yssy
+    is_correct: false
+    duration_seconds: 4.22
+    metadata:
+      input_tokens: 208
+      output_tokens: 118
+      cost_usd: 0.00144
+      cost_source: openrouter
+  - timestamp: '2025-11-25T20:52:26Z'
+    prompt: Viisikirjaiminen sana, kuvaa henkilöä joka ajaa
+    answer: ajaja
+    is_correct: true
+    duration_seconds: 4.54
+    metadata:
+      input_tokens: 207
+      output_tokens: 125
+      cost_usd: 0.00150875
+      cost_source: openrouter
+  - timestamp: '2025-11-25T20:59:32Z'
+    prompt: Järjestyslukusana kirjaimin kirjoitettuna
+    answer: eka, ake? eka, ake!
+    is_correct: false
+    duration_seconds: 32.58
+    metadata:
+      input_tokens: 205
+      output_tokens: 1974
+      cost_usd: 0.01999625
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:16:27Z'
+    prompt: >-
+      Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
+    answer: sakari rakas
+    is_correct: true
+    duration_seconds: 4.28
+    metadata:
+      input_tokens: 214
+      output_tokens: 261
+      cost_usd: 0.0028775
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:24:44Z'
+    prompt: Lause sanoista "pyhä", "iso", "hypnoosi" ja "on"
+    answer: '"pyhä hypnoosi on iso."'
+    is_correct: false
+    duration_seconds: 11.97
+    metadata:
+      input_tokens: 211
+      output_tokens: 687
+      cost_usd: 0.00713375
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:32:51Z'
+    prompt: 'Täydennä puuttuva kirjain: Assi _okaa kodissa.'
+    answer: assi dokaa kodissa.
+    is_correct: true
+    duration_seconds: 5.69
+    metadata:
+      input_tokens: 209
+      output_tokens: 373
+      cost_usd: 0.00399125
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:42:10Z'
+    prompt: 'Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!'
+    answer: sanni katsoo, isä, siis ota atosiisäsioostakinnas!
+    is_correct: false
+    duration_seconds: 68.53
+    metadata:
+      input_tokens: 214
+      output_tokens: 4158
+      cost_usd: 0.0418475
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:51:00Z'
+    prompt: Lause, jossa sekä tavit että sudet edustivat
+    answer: tavit, sudet edustivat.
+    is_correct: true
+    duration_seconds: 53.43
+    metadata:
+      input_tokens: 205
+      output_tokens: 3307
+      cost_usd: 0.03332625
+      cost_source: openrouter
+  - timestamp: '2025-11-25T21:54:49Z'
+    prompt: "Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _."
+    answer: isoja hajuja täällä aina aina täällä hajuja isoja.
+    is_correct: false
+    duration_seconds: 46.79
+    metadata:
+      input_tokens: 211
+      output_tokens: 2075
+      cost_usd: 0.02101375
+      cost_source: openrouter
