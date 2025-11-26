@@ -13,6 +13,7 @@ dependencies = [
     "llm-anthropic",
     "llm-gemini",
     "llm-openrouter",
+    "plotext",
     "rich",
     "ruamel-yaml>=0.18.16",
     "requests",

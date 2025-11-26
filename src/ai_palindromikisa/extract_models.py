@@ -10,9 +10,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import cast
 
+import plotext as plt
 import yaml
 from rich.console import Console
 from rich.table import Table
+
+from ai_palindromikisa.plots import show_all_plots
 
 
 def _extract_model_name(model_path: str) -> str:
@@ -177,6 +180,10 @@ def main() -> None:
         print()
         print("-" * 50)
         print(f"Total cost across all logged tasks: ${total_cost:.4f}")
+
+        # Show scatterplots
+        print()
+        show_all_plots(models)
     else:
         print("No models found or error occurred.")
 
