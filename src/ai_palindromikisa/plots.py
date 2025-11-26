@@ -7,13 +7,18 @@ import plotext as plt
 from rich.console import Console
 from rich.table import Table
 
-# Colors for plotext (only valid plotext color names)
-PLOTEXT_COLORS = [
+# Model color mapping based on provider/name patterns
+# Maps pattern (matched case-insensitively) to (plotext_color, rich_color)
+MODEL_COLOR_PATTERNS: dict[str, tuple[str, str]] = {
+    "anthropic": ("orange", "dark_orange"),  # closest to rgb(217 119 87)
+    "gemini": ("blue", "blue"),
+    "gpt": ("magenta", "magenta"),
+    "grok": ("green", "green"),
+}
+
+# Fallback colors for models not matching any pattern
+FALLBACK_PLOTEXT_COLORS = [
     "red",
-    "green",
-    "orange",
-    "blue",
-    "magenta",
     "cyan",
     "red+",
     "green+",
@@ -23,13 +28,8 @@ PLOTEXT_COLORS = [
     "cyan+",
 ]
 
-# Colors for rich legend (standard rich color names, matching plotext order)
-RICH_COLORS = [
+FALLBACK_RICH_COLORS = [
     "red",
-    "green",
-    "dark_orange",
-    "blue",
-    "magenta",
     "cyan",
     "bright_red",
     "bright_green",
@@ -158,19 +158,42 @@ def _compute_model_metrics(
     return metrics
 
 
-def _get_plotext_color(index: int) -> str:
-    """Get plotext color for a given index, cycling through available colors."""
-    return PLOTEXT_COLORS[index % len(PLOTEXT_COLORS)]
+def _get_color_for_model(model_name: str) -> tuple[str, str]:
+    """Get (plotext_color, rich_color) for a model based on name patterns."""
+    name_lower = model_name.lower()
+    for pattern, colors in MODEL_COLOR_PATTERNS.items():
+        if pattern in name_lower:
+            return colors
+    return None, None
 
 
-def _get_rich_color(index: int) -> str:
-    """Get rich color for a given index, cycling through available colors."""
-    return RICH_COLORS[index % len(RICH_COLORS)]
+def _assign_colors(
+    model_names: list[str],
+) -> dict[str, tuple[str, str]]:
+    """Assign colors to all models based on name patterns, with fallbacks."""
+    assignments: dict[str, tuple[str, str]] = {}
+    fallback_idx = 0
+
+    for name in model_names:
+        plotext_color, rich_color = _get_color_for_model(name)
+        if plotext_color:
+            assignments[name] = (plotext_color, rich_color)
+        else:
+            # Use fallback color
+            idx = fallback_idx % len(FALLBACK_PLOTEXT_COLORS)
+            assignments[name] = (
+                FALLBACK_PLOTEXT_COLORS[idx],
+                FALLBACK_RICH_COLORS[idx],
+            )
+            fallback_idx += 1
+
+    return assignments
 
 
 def _print_legend(
     metrics: list[tuple[str, float, float, float]],
     marker_map: dict[str, str],
+    color_map: dict[str, tuple[str, str]],
     title: str,
 ) -> None:
     """Print a legend table mapping colored markers to model names."""
@@ -178,10 +201,10 @@ def _print_legend(
     table = Table(title=title, show_edge=False)
     table.add_column("#", justify="right")
     table.add_column("Model", justify="left")
-    for i, (name, _, _, _) in enumerate(metrics):
+    for name, _, _, _ in metrics:
         marker = marker_map[name]
-        color = _get_rich_color(i)
-        table.add_row(f"[{color}]{marker}[/{color}]", name)
+        _, rich_color = color_map[name]
+        table.add_row(f"[{rich_color}]{marker}[/{rich_color}]", name)
     console.print(table)
 
 
@@ -195,7 +218,9 @@ def _setup_plot() -> None:
 
 
 def plot_success_vs_cost(
-    metrics: list[tuple[str, float, float, float]], marker_map: dict[str, str]
+    metrics: list[tuple[str, float, float, float]],
+    marker_map: dict[str, str],
+    color_map: dict[str, tuple[str, str]],
 ) -> None:
     """Plot Success % vs $/Task for all models."""
     _setup_plot()
@@ -203,22 +228,23 @@ def plot_success_vs_cost(
     plt.xlabel("$/Task")
     plt.ylabel("Success %")
 
-    costs = [m[2] for m in metrics]
     successes = [m[1] for m in metrics]
 
     # Plot each point with its marker
     for i, (name, _, x, _) in enumerate(metrics):
         y = successes[i]
         marker = marker_map[name]
-        color = _get_plotext_color(i)
-        plt.scatter([x], [y], marker=marker, color=color)
+        plotext_color, _ = color_map[name]
+        plt.scatter([x], [y], marker=marker, color=plotext_color)
 
     plt.show()
-    _print_legend(metrics, marker_map, "Legend")
+    _print_legend(metrics, marker_map, color_map, "Legend")
 
 
 def plot_success_vs_time(
-    metrics: list[tuple[str, float, float, float]], marker_map: dict[str, str]
+    metrics: list[tuple[str, float, float, float]],
+    marker_map: dict[str, str],
+    color_map: dict[str, tuple[str, str]],
 ) -> None:
     """Plot Success % vs Time/Task for all models."""
     _setup_plot()
@@ -226,21 +252,22 @@ def plot_success_vs_time(
     plt.xlabel("Time/Task (seconds)")
     plt.ylabel("Success %")
 
-    times = [m[3] for m in metrics]
     successes = [m[1] for m in metrics]
 
     for i, (name, _, _, x) in enumerate(metrics):
         y = successes[i]
         marker = marker_map[name]
-        color = _get_plotext_color(i)
-        plt.scatter([x], [y], marker=marker, color=color)
+        plotext_color, _ = color_map[name]
+        plt.scatter([x], [y], marker=marker, color=plotext_color)
 
     plt.show()
-    _print_legend(metrics, marker_map, "Legend")
+    _print_legend(metrics, marker_map, color_map, "Legend")
 
 
 def plot_time_vs_cost_top5(
-    metrics: list[tuple[str, float, float, float]], marker_map: dict[str, str]
+    metrics: list[tuple[str, float, float, float]],
+    marker_map: dict[str, str],
+    color_map: dict[str, tuple[str, str]],
 ) -> None:
     """Plot Time/Task vs $/Task for top 5 models by success rate."""
     # Sort by success rate and take top 5
@@ -251,13 +278,13 @@ def plot_time_vs_cost_top5(
     plt.xlabel("$/Task")
     plt.ylabel("Time/Task (s)")
 
-    for i, (name, _, cost, time) in enumerate(sorted_metrics):
+    for name, _, cost, time in sorted_metrics:
         marker = marker_map[name]
-        color = _get_plotext_color(i)
-        plt.scatter([cost], [time], marker=marker, color=color)
+        plotext_color, _ = color_map[name]
+        plt.scatter([cost], [time], marker=marker, color=plotext_color)
 
     plt.show()
-    _print_legend(sorted_metrics, marker_map, "Legend (top 5)")
+    _print_legend(sorted_metrics, marker_map, color_map, "Legend (top 5)")
 
 
 def show_all_plots(models: dict[str, dict]) -> None:
@@ -265,9 +292,10 @@ def show_all_plots(models: dict[str, dict]) -> None:
     metrics = _compute_model_metrics(models)
     model_names = [m[0] for m in metrics]
     marker_map = _assign_markers(model_names)
+    color_map = _assign_colors(model_names)
 
-    plot_success_vs_cost(metrics, marker_map)
+    plot_success_vs_cost(metrics, marker_map, color_map)
     print()
-    plot_success_vs_time(metrics, marker_map)
+    plot_success_vs_time(metrics, marker_map, color_map)
     print()
-    plot_time_vs_cost_top5(metrics, marker_map)
+    plot_time_vs_cost_top5(metrics, marker_map, color_map)
