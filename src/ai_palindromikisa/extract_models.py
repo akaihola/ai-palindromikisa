@@ -11,6 +11,8 @@ from pathlib import Path
 from typing import cast
 
 import yaml
+from rich.console import Console
+from rich.table import Table
 
 
 def _extract_model_name(model_path: str) -> str:
@@ -134,8 +136,17 @@ def main() -> None:
             reverse=True,
         )
 
-        print("\nModels ranked by accuracy:")
-        print()
+        # Create rich table
+        console = Console()
+        table = Table(title="Models ranked by accuracy", show_edge=False)
+        table.add_column("#", justify="right", no_wrap=True, overflow="fold")
+        table.add_column("%", justify="right", no_wrap=True, overflow="fold")
+        table.add_column("Tasks", justify="right", no_wrap=True, overflow="fold")
+        table.add_column("$/Task", justify="right")
+        table.add_column("First", justify="left")
+        table.add_column("Last", justify="left")
+        table.add_column("Model", justify="left")
+
         for i, (model_name, stats) in enumerate(sorted_models, 1):
             accuracy = (
                 (stats["correct_tasks"] / stats["task_count"]) * 100
@@ -147,14 +158,21 @@ def main() -> None:
                 if stats["task_count"] > 0
                 else 0
             )
-            dates_str = ", ".join(sorted(stats["dates"]))
+            sorted_dates = sorted(stats["dates"])
+            first_date = sorted_dates[0] if sorted_dates else ""
+            last_date = sorted_dates[-1] if sorted_dates else ""
 
-            print(
-                f"{i:2}. {model_name}: "
-                f"{stats['correct_tasks']}/{stats['task_count']} ({accuracy:.1f}%) "
-                f"- ${stats['total_cost']:.4f} total, ${avg_cost:.6f}/task"
+            table.add_row(
+                str(i),
+                f"{accuracy:.1f}%",
+                f"{stats['correct_tasks']}/{stats['task_count']}",
+                f"${avg_cost:.6f}",
+                first_date,
+                last_date,
+                model_name,
             )
-            print(f"    Dates: {dates_str}")
+
+        console.print(table)
 
         print()
         print("-" * 50)
