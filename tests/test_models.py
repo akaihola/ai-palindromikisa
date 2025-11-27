@@ -8,7 +8,6 @@ import pytest
 import ai_palindromikisa.models
 from ai_palindromikisa.models import (
     ModelConfig,
-    _extract_variation_index,
     _options_match,
     find_or_create_model_config,
     get_all_model_configs,
@@ -23,46 +22,45 @@ class TestModelConfig:
         config = ModelConfig(name="test/model")
         assert config.name == "test/model"
         assert config.options == {}
-        assert config.variation_index == 1
 
-    def test_get_base_filename(self):
-        """Test base filename generation."""
-        config = ModelConfig(name="openrouter/x-ai/grok-4", variation_index=2)
-        assert config.get_base_filename() == "openrouter-x-ai-grok-4-2"
+    def test_get_base_filename_no_options(self):
+        """Test base filename generation without options."""
+        config = ModelConfig(name="openrouter/x-ai/grok-4")
+        assert config.get_base_filename() == "openrouter-x-ai-grok-4"
+
+    def test_get_base_filename_with_options(self):
+        """Test base filename generation with options."""
+        config = ModelConfig(
+            name="openrouter/x-ai/grok-4", options={"temperature": 0.3}
+        )
+        assert config.get_base_filename() == "openrouter-x-ai-grok-4-t03"
 
     @pytest.mark.parametrize(
-        "name,variation,expected",
+        "name,options,expected",
         [
-            ("test/model", 1, "test-model-1"),
-            ("gemini/gemini-2.0-flash", 1, "gemini-gemini-2.0-flash-1"),
-            ("openrouter/x-ai/grok-4", 2, "openrouter-x-ai-grok-4-2"),
+            ("test/model", {}, "test-model"),
+            ("gemini/gemini-2.0-flash", {}, "gemini-gemini-2.0-flash"),
+            (
+                "openrouter/x-ai/grok-4",
+                {"temperature": 0.3},
+                "openrouter-x-ai-grok-4-t03",
+            ),
+            (
+                "openrouter/x-ai/grok-4",
+                {"temperature": 1.0},
+                "openrouter-x-ai-grok-4-t1",
+            ),
+            (
+                "test/model",
+                {"temperature": 0.3, "top_p": 0.9},
+                "test-model-t03-tp09",
+            ),
         ],
     )
-    def test_get_base_filename_parametrized(self, name, variation, expected):
-        """Test base filename for various model names."""
-        config = ModelConfig(name=name, variation_index=variation)
+    def test_get_base_filename_parametrized(self, name, options, expected):
+        """Test base filename for various model names and options."""
+        config = ModelConfig(name=name, options=options)
         assert config.get_base_filename() == expected
-
-
-class TestExtractVariationIndex:
-    """Tests for _extract_variation_index function."""
-
-    @pytest.mark.parametrize(
-        "filename_stem,expected",
-        [
-            ("test-model-1", 1),
-            ("test-model-2", 2),
-            ("openrouter-x-ai-grok-4-1", 1),
-            ("openrouter-x-ai-grok-4-2", 2),
-            ("gemini-gemini-2.0-flash-1", 1),
-            # Edge cases
-            ("model-without-index", 1),  # No valid index, default to 1
-            ("model-abc", 1),  # Non-numeric suffix
-        ],
-    )
-    def test_extract_variation_index(self, filename_stem, expected):
-        """Test variation index extraction from filename stems."""
-        assert _extract_variation_index(filename_stem) == expected
 
 
 class TestOptionsMatch:
@@ -102,9 +100,9 @@ class TestGetAllModelConfigs:
         models_dir = tmp_path / "models"
         models_dir.mkdir()
 
-        # Create test model files
-        (models_dir / "test-model-1.yaml").write_text("name: test/model\n")
-        (models_dir / "test-model-2.yaml").write_text(
+        # Create test model files with new naming convention
+        (models_dir / "test-model.yaml").write_text("name: test/model\n")
+        (models_dir / "test-model-t03.yaml").write_text(
             "name: test/model\noptions:\n  temperature: 0.3\n"
         )
 
@@ -116,13 +114,12 @@ class TestGetAllModelConfigs:
             configs = get_all_model_configs()
 
         assert len(configs) == 2
-        # Configs should be sorted by filename
+        # Configs are sorted by filename alphabetically
+        # test-model-t03.yaml comes before test-model.yaml
         assert configs[0].name == "test/model"
-        assert configs[0].variation_index == 1
-        assert configs[0].options == {}
+        assert configs[0].options == {"temperature": 0.3}
         assert configs[1].name == "test/model"
-        assert configs[1].variation_index == 2
-        assert configs[1].options == {"temperature": 0.3}
+        assert configs[1].options == {}
 
     def test_empty_models_directory(self, tmp_path: Path):
         """Test with empty models directory."""
@@ -146,7 +143,7 @@ class TestFindOrCreateModelConfig:
         """Test finding existing model config without options."""
         models_dir = tmp_path / "models"
         models_dir.mkdir()
-        (models_dir / "test-model-1.yaml").write_text("name: test/model\n")
+        (models_dir / "test-model.yaml").write_text("name: test/model\n")
 
         with mock.patch.object(
             ai_palindromikisa.models,
@@ -156,15 +153,14 @@ class TestFindOrCreateModelConfig:
             config = find_or_create_model_config("test/model", {})
 
         assert config.name == "test/model"
-        assert config.variation_index == 1
         assert config.options == {}
 
     def test_finds_existing_config_with_matching_options(self, tmp_path: Path):
         """Test finding existing model config with matching options."""
         models_dir = tmp_path / "models"
         models_dir.mkdir()
-        (models_dir / "test-model-1.yaml").write_text("name: test/model\n")
-        (models_dir / "test-model-2.yaml").write_text(
+        (models_dir / "test-model.yaml").write_text("name: test/model\n")
+        (models_dir / "test-model-t03.yaml").write_text(
             "name: test/model\noptions:\n  temperature: 0.3\n"
         )
 
@@ -176,14 +172,13 @@ class TestFindOrCreateModelConfig:
             config = find_or_create_model_config("test/model", {"temperature": 0.3})
 
         assert config.name == "test/model"
-        assert config.variation_index == 2
         assert config.options == {"temperature": 0.3}
 
     def test_creates_new_config_for_new_options(self, tmp_path: Path):
         """Test creating new model config for new options."""
         models_dir = tmp_path / "models"
         models_dir.mkdir()
-        (models_dir / "test-model-1.yaml").write_text("name: test/model\n")
+        (models_dir / "test-model.yaml").write_text("name: test/model\n")
 
         with mock.patch.object(
             ai_palindromikisa.models,
@@ -193,13 +188,12 @@ class TestFindOrCreateModelConfig:
             config = find_or_create_model_config("test/model", {"temperature": 0.5})
 
         assert config.name == "test/model"
-        assert config.variation_index == 2
         assert config.options == {"temperature": 0.5}
-        # Verify file was created
-        assert (models_dir / "test-model-2.yaml").exists()
+        # Verify file was created with option suffix
+        assert (models_dir / "test-model-t05.yaml").exists()
 
-    def test_creates_first_config_for_new_model(self, tmp_path: Path):
-        """Test creating first model config for new model."""
+    def test_creates_first_config_for_new_model_with_options(self, tmp_path: Path):
+        """Test creating first model config for new model with options."""
         models_dir = tmp_path / "models"
         models_dir.mkdir()
 
@@ -211,7 +205,40 @@ class TestFindOrCreateModelConfig:
             config = find_or_create_model_config("new/model", {"temperature": 0.3})
 
         assert config.name == "new/model"
-        assert config.variation_index == 1
         assert config.options == {"temperature": 0.3}
-        # Verify file was created
-        assert (models_dir / "new-model-1.yaml").exists()
+        # Verify file was created with option suffix
+        assert (models_dir / "new-model-t03.yaml").exists()
+
+    def test_creates_first_config_for_new_model_without_options(self, tmp_path: Path):
+        """Test creating first model config for new model without options."""
+        models_dir = tmp_path / "models"
+        models_dir.mkdir()
+
+        with mock.patch.object(
+            ai_palindromikisa.models,
+            "__file__",
+            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
+        ):
+            config = find_or_create_model_config("new/model", {})
+
+        assert config.name == "new/model"
+        assert config.options == {}
+        # Verify file was created without suffix
+        assert (models_dir / "new-model.yaml").exists()
+
+    def test_raises_error_on_options_mismatch(self, tmp_path: Path):
+        """Test that ValueError is raised when file exists with different options."""
+        models_dir = tmp_path / "models"
+        models_dir.mkdir()
+        # Create file with different options than what we'll request
+        (models_dir / "test-model-t03.yaml").write_text(
+            "name: test/model\noptions:\n  temperature: 0.5\n"
+        )
+
+        with mock.patch.object(
+            ai_palindromikisa.models,
+            "__file__",
+            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
+        ):
+            with pytest.raises(ValueError, match="different options"):
+                find_or_create_model_config("test/model", {"temperature": 0.3})

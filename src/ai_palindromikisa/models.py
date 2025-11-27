@@ -4,6 +4,8 @@ from pathlib import Path
 
 from ruamel.yaml import YAML
 
+from ai_palindromikisa.option_suffix import generate_option_suffix
+
 
 @dataclass
 class ModelConfig:
@@ -11,12 +13,18 @@ class ModelConfig:
 
     name: str
     options: dict[str, str | float | int | bool] = field(default_factory=dict)
-    variation_index: int = 1
 
     def get_base_filename(self) -> str:
-        """Get the base filename (without extension) for this model config."""
+        """Get the base filename (without extension) for this model config.
+
+        Examples:
+            ModelConfig("openrouter/x-ai/grok-4") -> "openrouter-x-ai-grok-4"
+            ModelConfig("openrouter/x-ai/grok-4", {"temperature": 0.3})
+                -> "openrouter-x-ai-grok-4-t03"
+        """
         model_filename = self.name.replace("/", "-")
-        return f"{model_filename}-{self.variation_index}"
+        suffix = generate_option_suffix(self.options)
+        return f"{model_filename}{suffix}"
 
     def get_model_file_path(self) -> Path:
         """Get the path to the model metadata file."""
@@ -47,12 +55,9 @@ def get_all_model_configs() -> list[ModelConfig]:
             model_name = model_data.get("name", "")
             if model_name:
                 options = model_data.get("options", {}) or {}
-                # Extract variation index from filename
-                variation_index = _extract_variation_index(model_file.stem)
                 config = ModelConfig(
                     name=model_name,
                     options=options,
-                    variation_index=variation_index,
                 )
                 configs.append(config)
                 options_str = f" (options: {options})" if options else ""
@@ -74,24 +79,6 @@ def get_all_model_configs() -> list[ModelConfig]:
     return configs
 
 
-def _extract_variation_index(filename_stem: str) -> int:
-    """Extract the variation index from a model filename stem.
-
-    Args:
-        filename_stem: Filename without extension (e.g., "openrouter-x-ai-grok-4-2")
-
-    Returns:
-        The variation index (e.g., 2), or 1 if not found
-    """
-    parts = filename_stem.rsplit("-", 1)
-    if len(parts) == 2:
-        try:
-            return int(parts[1])
-        except ValueError:
-            pass
-    return 1
-
-
 def find_or_create_model_config(
     model_name: str, options: dict[str, str | float | int | bool]
 ) -> ModelConfig:
@@ -102,41 +89,30 @@ def find_or_create_model_config(
         options: Dictionary of options (e.g., {"temperature": 0.3})
 
     Returns:
-        ModelConfig with the appropriate variation index
+        ModelConfig with the appropriate options
+
+    Raises:
+        ValueError: If a model file exists but has different options than expected
     """
-    models_dir = Path(__file__).parent.parent.parent / "models"
-    models_dir.mkdir(parents=True, exist_ok=True)
+    config = ModelConfig(name=model_name, options=options)
+    model_file_path = config.get_model_file_path()
 
-    model_filename_base = model_name.replace("/", "-")
+    if model_file_path.exists():
+        # Validate that existing file has matching options
+        yaml_obj = YAML()
+        model_data = yaml_obj.load(model_file_path.read_text(encoding="utf-8"))
+        file_options = model_data.get("options", {}) or {}
 
-    # Find all existing model files for this model name
-    existing_files = sorted(models_dir.glob(f"{model_filename_base}-*.yaml"))
+        if not _options_match(options, file_options):
+            raise ValueError(
+                f"Model file {model_file_path} exists but has different options. "
+                f"Expected: {options}, Found: {file_options}"
+            )
 
-    # Check each existing file for matching options
-    for model_file in existing_files:
-        try:
-            yaml_obj = YAML()
-            model_data = yaml_obj.load(model_file.read_text(encoding="utf-8"))
-            file_options = model_data.get("options", {}) or {}
+        return config
 
-            # Compare options (normalize to handle type differences)
-            if _options_match(options, file_options):
-                variation_index = _extract_variation_index(model_file.stem)
-                return ModelConfig(
-                    name=model_name,
-                    options=options,
-                    variation_index=variation_index,
-                )
-        except Exception as e:
-            print(f"Warning: Could not read model file {model_file.name}: {e}")
-
-    # No matching file found, create a new one with next variation index
-    next_index = _get_next_variation_index(existing_files)
-    config = ModelConfig(name=model_name, options=options, variation_index=next_index)
-
-    # Create the model metadata file
+    # File doesn't exist, create it
     _create_model_file(config)
-
     return config
 
 
@@ -164,22 +140,12 @@ def _options_match(
     return True
 
 
-def _get_next_variation_index(existing_files: list[Path]) -> int:
-    """Get the next available variation index."""
-    if not existing_files:
-        return 1
-
-    max_index = 0
-    for f in existing_files:
-        index = _extract_variation_index(f.stem)
-        max_index = max(max_index, index)
-
-    return max_index + 1
-
-
 def _create_model_file(config: ModelConfig) -> Path:
     """Create a model metadata file for the given configuration."""
     model_file_path = config.get_model_file_path()
+
+    # Ensure models directory exists
+    model_file_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Create the model metadata
     model_metadata: dict = {"name": config.name}
@@ -205,7 +171,7 @@ def ensure_model_metadata_exists(config: ModelConfig) -> Path:
     """Ensure the model metadata file exists for the given configuration.
 
     Args:
-        config: ModelConfig with name, options, and variation_index
+        config: ModelConfig with name and options
 
     Returns:
         Path to the model metadata file

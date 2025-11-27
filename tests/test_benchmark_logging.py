@@ -16,19 +16,23 @@ class TestGetLogPath:
     """Tests for get_log_path function."""
 
     @pytest.mark.parametrize(
-        "name,variation,expected_suffix",
+        "name,options,expected_suffix",
         [
-            ("test/model", 1, "test-model-1.yaml"),
-            ("test/model", 2, "test-model-2.yaml"),
-            ("openrouter/x-ai/grok-4", 1, "openrouter-x-ai-grok-4-1.yaml"),
-            ("openrouter/x-ai/grok-4", 2, "openrouter-x-ai-grok-4-2.yaml"),
+            ("test/model", {}, "test-model.yaml"),
+            ("test/model", {"temperature": 0.3}, "test-model-t03.yaml"),
+            ("openrouter/x-ai/grok-4", {}, "openrouter-x-ai-grok-4.yaml"),
+            (
+                "openrouter/x-ai/grok-4",
+                {"temperature": 0.3},
+                "openrouter-x-ai-grok-4-t03.yaml",
+            ),
         ],
     )
-    def test_log_path_includes_variation_suffix(
-        self, tmp_path: Path, name, variation, expected_suffix
+    def test_log_path_includes_option_suffix(
+        self, tmp_path: Path, name, options, expected_suffix
     ):
-        """Test that log path includes variation index suffix."""
-        config = ModelConfig(name=name, variation_index=variation)
+        """Test that log path includes option-based suffix."""
+        config = ModelConfig(name=name, options=options)
 
         src_dir = tmp_path / "src" / "ai_palindromikisa"
         src_dir.mkdir(parents=True, exist_ok=True)
@@ -75,7 +79,7 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
         self, tmp_path: Path, mock_system_prompt, mock_results
     ):
         """Test log file creation with real file system operations."""
-        config = ModelConfig(name="test/test-model", variation_index=1)
+        config = ModelConfig(name="test/test-model")
 
         # Create a temporary logs.py file in the expected location
         src_dir = tmp_path / "src" / "ai_palindromikisa"
@@ -127,8 +131,8 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
             assert len(date_str) == 10
             assert date_str[4] == "-" and date_str[7] == "-"
 
-            # Verify model path format includes variation suffix
-            assert data["model"] == "models/test-test-model-1.yaml"
+            # Verify model path format (no suffix for no options)
+            assert data["model"] == "models/test-test-model.yaml"
 
             # Verify prompt template contains system prompt and placeholder
             assert mock_system_prompt in data["prompt_template"]
@@ -154,14 +158,13 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
             assert log_path.parent.name == "benchmark_logs"
             assert log_path.parent.parent == tmp_path
 
-    def test_model_name_conversion_with_variation(
+    def test_model_name_conversion_with_options(
         self, tmp_path: Path, mock_system_prompt, mock_results
     ):
-        """Test that model names and variation are properly converted."""
+        """Test that model names and options are properly converted to filename."""
         config = ModelConfig(
             name="gemini/gemini-2.0-flash",
             options={"temperature": 0.3},
-            variation_index=2,
         )
 
         # Create temporary logs.py
@@ -185,15 +188,15 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
 
             data = cast("dict", yaml.safe_load(log_path.read_text(encoding="utf-8")))
 
-            # Verify model path includes variation index
-            assert data["model"] == "models/gemini-gemini-2.0-flash-2.yaml"
+            # Verify model path includes option suffix
+            assert data["model"] == "models/gemini-gemini-2.0-flash-t03.yaml"
 
-            # Verify filename includes variation index
-            assert "gemini-gemini-2.0-flash-2" in log_path.name
+            # Verify filename includes option suffix
+            assert "gemini-gemini-2.0-flash-t03" in log_path.name
 
     def test_directory_creation(self, tmp_path: Path, mock_system_prompt, mock_results):
         """Test that the benchmark_logs directory is created if it doesn't exist."""
-        config = ModelConfig(name="test/model", variation_index=1)
+        config = ModelConfig(name="test/model")
 
         # Create temporary logs.py
         src_dir = tmp_path / "src" / "ai_palindromikisa"
@@ -227,23 +230,24 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
             assert log_path.exists()
 
     @pytest.mark.parametrize(
-        "variation_index,expected_suffix",
+        "options,expected_suffix",
         [
-            (1, "-1.yaml"),
-            (2, "-2.yaml"),
-            (10, "-10.yaml"),
+            ({}, ".yaml"),
+            ({"temperature": 0.3}, "-t03.yaml"),
+            ({"temperature": 1.0}, "-t1.yaml"),
+            ({"temperature": 0.3, "top_p": 0.9}, "-t03-tp09.yaml"),
         ],
     )
-    def test_filename_format_with_variation(
+    def test_filename_format_with_options(
         self,
         tmp_path: Path,
         mock_system_prompt,
         mock_results,
-        variation_index,
+        options,
         expected_suffix,
     ):
-        """Test that log filename includes variation index."""
-        config = ModelConfig(name="test/test-model", variation_index=variation_index)
+        """Test that log filename includes option-based suffix."""
+        config = ModelConfig(name="test/test-model", options=options)
 
         # Create temporary logs.py
         src_dir = tmp_path / "src" / "ai_palindromikisa"
@@ -263,10 +267,10 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
                 metadata={},
             )
 
-            # Verify filename ends with variation suffix
+            # Verify filename ends with expected suffix
             assert log_path.name.endswith(expected_suffix)
 
-            # Verify filename format: YYYY-MM-DD-model-name-N.yaml
+            # Verify filename format: YYYY-MM-DD-model-name[-options].yaml
             filename = log_path.name
             date_part = filename[:10]
             assert len(date_part) == 10
@@ -283,7 +287,7 @@ class TestGetExistingLogs:
 
     def test_matches_by_model_field(self, tmp_path: Path, mock_system_prompt):
         """Test matching logs by model field in YAML."""
-        config = ModelConfig(name="test/model", variation_index=2)
+        config = ModelConfig(name="test/model", options={"temperature": 0.3})
 
         src_dir = tmp_path / "src" / "ai_palindromikisa"
         src_dir.mkdir(parents=True, exist_ok=True)
@@ -296,32 +300,32 @@ class TestGetExistingLogs:
         # Create a log file with matching model field
         log_content = {
             "date": "2025-01-01",
-            "model": "models/test-model-2.yaml",
+            "model": "models/test-model-t03.yaml",
             "prompt_template": mock_system_prompt,
             "tasks": [{"prompt": "test", "answer": "test", "is_correct": True}],
         }
-        (logs_dir / "2025-01-01-test-model-2.yaml").write_text(yaml.dump(log_content))
+        (logs_dir / "2025-01-01-test-model-t03.yaml").write_text(yaml.dump(log_content))
 
-        # Create a log file for different variation (should not match)
-        log_content_v1 = {
+        # Create a log file for different options (should not match)
+        log_content_no_opts = {
             "date": "2025-01-01",
-            "model": "models/test-model-1.yaml",
+            "model": "models/test-model.yaml",
             "prompt_template": mock_system_prompt,
             "tasks": [{"prompt": "other", "answer": "other", "is_correct": False}],
         }
-        (logs_dir / "2025-01-01-test-model-1.yaml").write_text(
-            yaml.dump(log_content_v1)
+        (logs_dir / "2025-01-01-test-model.yaml").write_text(
+            yaml.dump(log_content_no_opts)
         )
 
         with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
             logs = get_existing_logs(config, mock_system_prompt)
 
         assert len(logs) == 1
-        assert logs[0]["model"] == "models/test-model-2.yaml"
+        assert logs[0]["model"] == "models/test-model-t03.yaml"
 
     def test_matches_by_filename_pattern(self, tmp_path: Path, mock_system_prompt):
         """Test matching logs by filename pattern."""
-        config = ModelConfig(name="test/model", variation_index=1)
+        config = ModelConfig(name="test/model")
 
         src_dir = tmp_path / "src" / "ai_palindromikisa"
         src_dir.mkdir(parents=True, exist_ok=True)
@@ -334,11 +338,11 @@ class TestGetExistingLogs:
         # Create a log file with matching filename pattern
         log_content = {
             "date": "2025-01-01",
-            "model": "models/test-model-1.yaml",
+            "model": "models/test-model.yaml",
             "prompt_template": mock_system_prompt,
             "tasks": [],
         }
-        (logs_dir / "2025-01-01-test-model-1.yaml").write_text(yaml.dump(log_content))
+        (logs_dir / "2025-01-01-test-model.yaml").write_text(yaml.dump(log_content))
 
         with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
             logs = get_existing_logs(config, mock_system_prompt)
@@ -347,7 +351,7 @@ class TestGetExistingLogs:
 
     def test_filters_by_system_prompt(self, tmp_path: Path, mock_system_prompt):
         """Test that logs are filtered by system prompt."""
-        config = ModelConfig(name="test/model", variation_index=1)
+        config = ModelConfig(name="test/model")
 
         src_dir = tmp_path / "src" / "ai_palindromikisa"
         src_dir.mkdir(parents=True, exist_ok=True)
@@ -360,20 +364,20 @@ class TestGetExistingLogs:
         # Create a log file with matching system prompt
         log_matching = {
             "date": "2025-01-01",
-            "model": "models/test-model-1.yaml",
+            "model": "models/test-model.yaml",
             "prompt_template": mock_system_prompt,
             "tasks": [],
         }
-        (logs_dir / "2025-01-01-test-model-1.yaml").write_text(yaml.dump(log_matching))
+        (logs_dir / "2025-01-01-test-model.yaml").write_text(yaml.dump(log_matching))
 
         # Create a log file with different system prompt
         log_different = {
             "date": "2025-01-02",
-            "model": "models/test-model-1.yaml",
+            "model": "models/test-model.yaml",
             "prompt_template": "Different prompt\n{prompt}",
             "tasks": [],
         }
-        (logs_dir / "2025-01-02-test-model-1.yaml").write_text(yaml.dump(log_different))
+        (logs_dir / "2025-01-02-test-model.yaml").write_text(yaml.dump(log_different))
 
         with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
             logs = get_existing_logs(config, mock_system_prompt)

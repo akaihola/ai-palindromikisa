@@ -1,0 +1,3 @@
+name: openrouter/x-ai/grok-4
+options:
+  temperature: 0.3

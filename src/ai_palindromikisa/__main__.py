@@ -7,6 +7,7 @@ This module provides the main CLI interface with subcommands:
 - stats: Extract and display statistics from benchmark logs
 - tasks: Display task-level statistics across all models
 - update-pricing: Update pricing cache from LiteLLM GitHub repository
+- migrate: Migrate files from old naming convention to new option-based naming
 """
 
 import sys
@@ -14,6 +15,7 @@ import sys
 # Import the main functions from our modules
 from .benchmark import main as benchmark_main
 from .extract_models import main as extract_models_main
+from .migrate import main as migrate_main
 from .pricing_cache import update_pricing_cache
 from .tasks_stats import main as tasks_stats_main
 
@@ -22,16 +24,19 @@ def main():
     """Main entry point for the ai-palindromikisa console script."""
     if len(sys.argv) < 2:
         print(
-            "Usage: ai-palindromikisa {benchmark,stats,tasks,update-pricing} [options]"
+            "Usage: ai-palindromikisa "
+            "{benchmark,stats,tasks,update-pricing,migrate} [options]"
         )
         print("  benchmark       Run palindrome benchmark tasks")
         print("  stats           Extract and display statistics from benchmark logs")
         print("  tasks           Display task-level statistics across all models")
         print("  update-pricing  Update pricing cache from LiteLLM repository")
+        print("  migrate         Migrate files to new option-based naming convention")
         print()
         print("For help with a specific command:")
         print("  ai-palindromikisa benchmark --help")
         print("  ai-palindromikisa stats --help")
+        print("  ai-palindromikisa migrate --help")
         sys.exit(1)
 
     command = sys.argv[1]
@@ -39,16 +44,19 @@ def main():
     # Handle help commands
     if command in ["-h", "--help", "help"]:
         print(
-            "Usage: ai-palindromikisa {benchmark,stats,tasks,update-pricing} [options]"
+            "Usage: ai-palindromikisa "
+            "{benchmark,stats,tasks,update-pricing,migrate} [options]"
         )
         print("  benchmark       Run palindrome benchmark tasks")
         print("  stats           Extract and display statistics from benchmark logs")
         print("  tasks           Display task-level statistics across all models")
         print("  update-pricing  Update pricing cache from LiteLLM repository")
+        print("  migrate         Migrate files to new option-based naming convention")
         print()
         print("For help with a specific command:")
         print("  ai-palindromikisa benchmark --help")
         print("  ai-palindromikisa stats --help")
+        print("  ai-palindromikisa migrate --help")
         sys.exit(0)
 
     # Remove the script name from sys.argv so subcommands can parse their own arguments
@@ -67,9 +75,13 @@ def main():
             else:
                 print("Failed to update pricing data from LiteLLM repository")
                 sys.exit(1)
+        elif command == "migrate":
+            migrate_main()
         else:
             print(f"Unknown command: {command}")
-            print("Available commands: benchmark, stats, tasks, update-pricing")
+            print(
+                "Available commands: benchmark, stats, tasks, update-pricing, migrate"
+            )
             print()
             print("For help with a specific command:")
             print("  ai-palindromikisa benchmark --help")

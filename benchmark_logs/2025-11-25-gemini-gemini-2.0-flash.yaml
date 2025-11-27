@@ -1,0 +1,131 @@
+date: '2025-11-25'
+model: models/gemini-gemini-2.0-flash.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  {prompt}
+  VASTAUS:
+tasks:
+- timestamp: '2025-11-25T20:40:42Z'
+  prompt: Suomalainen kaksikirjaiminen paikannimi
+  answer: oulu – luulo
+  is_correct: false
+  duration_seconds: 0.63
+  metadata:
+    input_tokens: 196
+    output_tokens: 18
+    cost_usd: 0.0000402
+    cost_source: litellm
+- timestamp: '2025-11-25T20:48:18Z'
+  prompt: Kolmekirjaiminen sana, käytä vain kirjaimia T ja U
+  answer: tut
+  is_correct: false
+  duration_seconds: 0.72
+  metadata:
+    input_tokens: 201
+    output_tokens: 14
+    cost_usd: 0.00003855
+    cost_source: litellm
+- timestamp: '2025-11-25T20:49:26Z'
+  prompt: Nelikirjaiminen sana, käytä vain kirjaimia Y ja S
+  answer: syys
+  is_correct: true
+  duration_seconds: 0.69
+  metadata:
+    input_tokens: 201
+    output_tokens: 15
+    cost_usd: 0.00003915
+    cost_source: litellm
+- timestamp: '2025-11-25T20:50:54Z'
+  prompt: Viisikirjaiminen sana, kuvaa henkilöä joka ajaa
+  answer: auttaa, juttua
+  is_correct: false
+  duration_seconds: 0.63
+  metadata:
+    input_tokens: 200
+    output_tokens: 19
+    cost_usd: 0.0000414
+    cost_source: litellm
+- timestamp: '2025-11-25T20:53:35Z'
+  prompt: Järjestyslukusana kirjaimin kirjoitettuna
+  answer: neekerisiki, isirekeen.
+  is_correct: false
+  duration_seconds: 0.61
+  metadata:
+    input_tokens: 198
+    output_tokens: 21
+    cost_usd: 0.0000423
+    cost_source: litellm
+- timestamp: '2025-11-25T21:01:55Z'
+  prompt: >-
+    Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
+  answer: sakarrakas.
+  is_correct: false
+  duration_seconds: 0.43
+  metadata:
+    input_tokens: 209
+    output_tokens: 17
+    cost_usd: 0.00004155
+    cost_source: litellm
+- timestamp: '2025-11-25T21:17:52Z'
+  prompt: Lause sanoista "pyhä", "iso", "hypnoosi" ja "on"
+  answer: on iso pyhä. hypnoosi on.
+  is_correct: false
+  duration_seconds: 0.56
+  metadata:
+    input_tokens: 205
+    output_tokens: 22
+    cost_usd: 0.00004395
+    cost_source: litellm
+- timestamp: '2025-11-25T21:31:59Z'
+  prompt: 'Täydennä puuttuva kirjain: Assi _okaa kodissa.'
+  answer: assi kokaa kodissa.
+  is_correct: false
+  duration_seconds: 0.71
+  metadata:
+    input_tokens: 202
+    output_tokens: 19
+    cost_usd: 0.0000417
+    cost_source: litellm
+- timestamp: '2025-11-25T21:35:13Z'
+  prompt: 'Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!'
+  answer: sanni katso, isä, siis ota ostakin s.
+  is_correct: false
+  duration_seconds: 0.74
+  metadata:
+    input_tokens: 206
+    output_tokens: 26
+    cost_usd: 0.0000465
+    cost_source: litellm
+- timestamp: '2025-11-25T21:45:23Z'
+  prompt: Lause, jossa sekä tavit että sudet edustivat
+  answer: tavit edustivat, vasti tu detivat.
+  is_correct: false
+  duration_seconds: 0.59
+  metadata:
+    input_tokens: 199
+    output_tokens: 26
+    cost_usd: 0.00004545
+    cost_source: litellm
+- timestamp: '2025-11-25T21:54:10Z'
+  prompt: "Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _."
+  answer: isoja hajuja ujaha josi.
+  is_correct: false
+  duration_seconds: 0.65
+  metadata:
+    input_tokens: 203
+    output_tokens: 23
+    cost_usd: 0.00004425
+    cost_source: litellm
