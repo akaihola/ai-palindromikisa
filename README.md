@@ -1,4 +1,4 @@
-# AI Palindromikisa
+# AI-Palindromikisa
 
 AI Palindrome Benchmark - evaluating LLM capability for creating palindromes.
 
