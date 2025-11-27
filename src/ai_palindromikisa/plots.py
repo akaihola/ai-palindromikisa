@@ -222,17 +222,18 @@ def plot_success_vs_cost(
     marker_map: dict[str, str],
     color_map: dict[str, tuple[str, str]],
 ) -> None:
-    """Plot Success % vs $/Task for all models."""
+    """Plot Success % vs ¢/Task for all models."""
     _setup_plot()
-    plt.title("Success % vs $/Task (all models)")
-    plt.xlabel("$/Task")
+    plt.title("Success % vs ¢/Task (all models)")
+    plt.xlabel("¢/Task")
     plt.ylabel("Success %")
 
     successes = [m[1] for m in metrics]
 
-    # Plot each point with its marker
-    for i, (name, _, x, _) in enumerate(metrics):
+    # Plot each point with its marker (convert cost to cents)
+    for i, (name, _, cost, _) in enumerate(metrics):
         y = successes[i]
+        x = cost * 100  # Convert to cents
         marker = marker_map[name]
         plotext_color, _ = color_map[name]
         plt.scatter([x], [y], marker=marker, color=plotext_color)
@@ -269,19 +270,19 @@ def plot_time_vs_cost_top5(
     marker_map: dict[str, str],
     color_map: dict[str, tuple[str, str]],
 ) -> None:
-    """Plot Time/Task vs $/Task for top 5 models by success rate."""
+    """Plot Time/Task vs ¢/Task for top 5 models by success rate."""
     # Sort by success rate and take top 5
     sorted_metrics = sorted(metrics, key=lambda m: m[1], reverse=True)[:5]
 
     _setup_plot()
-    plt.title("Time/Task vs $/Task (top 5 by success)")
-    plt.xlabel("$/Task")
+    plt.title("Time/Task vs ¢/Task (top 5 by success)")
+    plt.xlabel("¢/Task")
     plt.ylabel("Time/Task (s)")
 
     for name, _, cost, time in sorted_metrics:
         marker = marker_map[name]
         plotext_color, _ = color_map[name]
-        plt.scatter([cost], [time], marker=marker, color=plotext_color)
+        plt.scatter([cost * 100], [time], marker=marker, color=plotext_color)
 
     plt.show()
     _print_legend(sorted_metrics, marker_map, color_map, "Legend (top 5)")

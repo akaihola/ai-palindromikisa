@@ -4,6 +4,9 @@ CLAUDE.md
 # UV lock file
 uv.lock
 
+# GH Pages dynamically created files
+gh-pages/
+
 # Python cache and build files
 __pycache__/
 *.py[cod]

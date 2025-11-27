@@ -114,7 +114,7 @@ def main() -> None:
     )
     parser.parse_args()
 
-    print("AI Palindromikisa - Model Statistics")
+    print("AI-Palindromikisa - Model Statistics")
     print("=" * 50)
     print(f"Running at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print()
@@ -145,7 +145,7 @@ def main() -> None:
         table.add_column("#", justify="right", no_wrap=True, overflow="fold")
         table.add_column("%", justify="right", no_wrap=True, overflow="fold")
         table.add_column("Tasks", justify="right", no_wrap=True, overflow="fold")
-        table.add_column("$/Task", justify="right")
+        table.add_column("¢/Task", justify="right")
         table.add_column("First", justify="left")
         table.add_column("Last", justify="left")
         table.add_column("Model", justify="left")
@@ -156,8 +156,8 @@ def main() -> None:
                 if stats["task_count"] > 0
                 else 0
             )
-            avg_cost = (
-                stats["total_cost"] / stats["task_count"]
+            avg_cost_cents = (
+                (stats["total_cost"] / stats["task_count"]) * 100
                 if stats["task_count"] > 0
                 else 0
             )
@@ -169,7 +169,7 @@ def main() -> None:
                 str(i),
                 f"{accuracy:.1f}%",
                 f"{stats['correct_tasks']}/{stats['task_count']}",
-                f"${avg_cost:.6f}",
+                f"{avg_cost_cents:.2f}¢",
                 first_date,
                 last_date,
                 model_name,
@@ -179,7 +179,7 @@ def main() -> None:
 
         print()
         print("-" * 50)
-        print(f"Total cost across all logged tasks: ${total_cost:.4f}")
+        print(f"Total cost across all logged tasks: ${total_cost:.2f}")
 
         # Show scatterplots
         print()
