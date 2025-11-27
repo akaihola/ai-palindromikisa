@@ -5,6 +5,7 @@ import time
 from datetime import datetime, timezone
 
 import llm
+from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
 from ai_palindromikisa.cli import parse_cli_arguments
 from ai_palindromikisa.formatting import format_price_for_console
@@ -70,6 +71,13 @@ def normalize_text(text):
     return text_no_punct.lower().strip()
 
 
+def _is_transient_api_error(exception: BaseException) -> bool:
+    """Check if exception is a transient API error that should be retried."""
+    error_msg = str(exception).lower()
+    transient_indicators = ["retry", "rate limit", "timeout", "503", "502", "429"]
+    return any(indicator in error_msg for indicator in transient_indicators)
+
+
 def run_benchmark_for_config(
     config: ModelConfig, system_prompt: str, tasks: list
 ) -> None:
@@ -121,11 +129,23 @@ def run_benchmark_for_config(
         print(f"Prompt: {task['prompt']}")
         print(f"Reference: {reference}")
 
-        # Pass options to model.prompt() if any are configured
-        if config.options:
-            response = model.prompt(full_prompt, **config.options)
-        else:
-            response = model.prompt(full_prompt)
+        @retry(
+            stop=stop_after_attempt(3),
+            wait=wait_exponential(multiplier=1, min=2, max=30),
+            retry=retry_if_exception(_is_transient_api_error),
+            reraise=True,
+        )
+        def call_model():
+            if config.options:
+                return model.prompt(full_prompt, **config.options)
+            return model.prompt(full_prompt)
+
+        try:
+            response = call_model()
+        except Exception as e:
+            print(f"Error: {e}")
+            print("Skipping task after retries failed.\n")
+            continue
 
         response_text = extract_palindrome(response.text()).strip().lower()
         response_text = truncate_long_response(response_text, reference)
