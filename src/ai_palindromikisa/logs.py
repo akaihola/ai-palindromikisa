@@ -1,20 +1,29 @@
 from datetime import datetime
 from io import StringIO
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ruamel.yaml import YAML
 
+if TYPE_CHECKING:
+    from ai_palindromikisa.models import ModelConfig
 
-def get_existing_logs(model_name: str, system_prompt: str) -> list:
-    """Read all existing log files for the model variation."""
+
+def get_existing_logs(config: "ModelConfig", system_prompt: str) -> list:
+    """Read all existing log files for the model configuration.
+
+    Matches logs by the model file reference (which includes variation index).
+    """
     # Get benchmark_logs directory path
     logs_dir = Path(__file__).parent.parent.parent / "benchmark_logs"
 
     if not logs_dir.exists():
         return []
 
-    # Replace slashes with dashes in model name for filename matching
-    model_filename = model_name.replace("/", "-")
+    # The expected model file path reference in logs
+    expected_model_path = f"models/{config.get_base_filename()}.yaml"
+    # Also match by filename pattern (for backward compatibility and direct matching)
+    expected_log_suffix = f"-{config.get_base_filename()}.yaml"
 
     existing_logs = []
     for log_file in logs_dir.glob("*.yaml"):
@@ -30,25 +39,16 @@ def get_existing_logs(model_name: str, system_prompt: str) -> list:
             ):
                 continue
 
-            # Check if this log file matches our model
-            # Method 1: Check filename pattern
-            if f"-{model_filename}.yaml" in log_file.name:
+            # Method 1: Check if log filename ends with expected suffix
+            if log_file.name.endswith(expected_log_suffix):
                 existing_logs.append(log_data)
                 continue
 
             # Method 2: Check the model field in the log data
-            # Extract model from log_data.model field and normalize it
             model_field = log_data.get("model", "")
-            if model_field:
-                # Remove "models/" prefix and "-1.yaml" suffix
-                clean_model = model_field.replace("models/", "").replace("-1.yaml", "")
-                # Convert dashes to slashes for comparison
-                clean_model = clean_model.replace("-", "/")
-
-                # Check if the cleaned model matches our target model
-                if clean_model == model_name:
-                    existing_logs.append(log_data)
-                    continue
+            if model_field == expected_model_path:
+                existing_logs.append(log_data)
+                continue
 
         except Exception as e:
             print(f"Warning: Could not read log file {log_file}: {e}")
@@ -106,16 +106,13 @@ def save_log(log_path, log_data):
     log_path.write_text(string_stream.getvalue(), encoding="utf-8")
 
 
-def get_log_path(model_name: str) -> Path:
-    """Get the path to today's log file for the given model."""
-    # Generate filename with date and model name
+def get_log_path(config: "ModelConfig") -> Path:
+    """Get the path to today's log file for the given model configuration."""
+    # Generate filename with date and model config base filename
     date_str = datetime.now().strftime("%Y-%m-%d")
-    # Replace slashes with dashes in model name for filename
-    model_filename = model_name.replace("/", "-")
-    log_filename = f"benchmark_logs/{date_str}-{model_filename}.yaml"
+    log_filename = f"benchmark_logs/{date_str}-{config.get_base_filename()}.yaml"
 
     # Create benchmark_logs directory if it doesn't exist
-    # From src/ai_palindromikisa/benchmark.py, go up 3 levels to reach project root
     log_path = Path(__file__).parent.parent.parent / log_filename
     log_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -123,7 +120,7 @@ def get_log_path(model_name: str) -> Path:
 
 
 def save_task_result(
-    model_name: str,
+    config: "ModelConfig",
     system_prompt: str,
     prompt: str,
     response_text: str,
@@ -133,12 +130,10 @@ def save_task_result(
     metadata: dict,
 ) -> Path:
     """Save a single task result to the log file."""
-    log_path = get_log_path(model_name)
+    log_path = get_log_path(config)
 
-    # Generate model path
-    model_filename = model_name.replace("/", "-")
-    variation_index = 1  # TODO: Implement variation tracking
-    model_path = f"models/{model_filename}-{variation_index}.yaml"
+    # Generate model path reference
+    model_path = f"models/{config.get_base_filename()}.yaml"
 
     # Load existing log or create new one
     existing_data = load_existing_log(log_path) or {
