@@ -48,6 +48,8 @@ tasks:
   - prompt: >-
       Täydennä alku ja loppu lyhyesti.
       Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
+      Täydennettävä palindromin keskiosa:
+      Uolevi. Otitte, imaisit. Uutisia mietti toivelounaalla
     reference: >-
       Amalia Ladallaan. Uolevi. Otitte, imaisit.
       Uutisia mietti toivelounaalla Dalai-Lama.

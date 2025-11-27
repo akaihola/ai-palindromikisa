@@ -30,18 +30,6 @@ tasks:
     output_tokens: 30
     cost_usd: 0.0000513
     cost_source: litellm
-- timestamp: '2025-11-26T05:55:41Z'
-  prompt: >-
-    Täydennä alku ja loppu lyhyesti.
-    Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
-  answer: '"nainen katsoo, venäjässä jeesus. vesa, katsoo naista.'
-  is_correct: false
-  duration_seconds: 1.93
-  metadata:
-    input_tokens: 223
-    output_tokens: 32
-    cost_usd: 0.00005265
-    cost_source: litellm
 - timestamp: '2025-11-26T07:38:31Z'
   prompt: 'Täytä keskelle yksi sana: Niskasta _______, tukat saksin.'
   answer: niskasta saatana, tukat saksin.

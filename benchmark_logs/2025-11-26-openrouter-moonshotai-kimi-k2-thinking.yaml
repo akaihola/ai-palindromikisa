@@ -30,18 +30,6 @@ tasks:
     output_tokens: 7202
     cost_usd: 0.0181544
     cost_source: openrouter
-- timestamp: '2025-11-26T15:39:06Z'
-  prompt: >-
-    Täydennä alku ja loppu lyhyesti.
-    Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
-  answer: 'on anna, imaami, lada: adal, imaami, anna no'
-  is_correct: false
-  duration_seconds: 85.57
-  metadata:
-    input_tokens: 251
-    output_tokens: 14251
-    cost_usd: 0.0357781
-    cost_source: openrouter
 - timestamp: '2025-11-26T15:44:50Z'
   prompt: 'Täytä keskelle yksi sana: Niskasta _______, tukat saksin.'
   answer: niskasta niin, tukat saksin.

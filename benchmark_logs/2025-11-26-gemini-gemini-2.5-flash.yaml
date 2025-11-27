@@ -30,18 +30,6 @@ tasks:
     output_tokens: 6258
     cost_usd: 0.0157116
     cost_source: litellm
-- timestamp: '2025-11-26T05:54:33Z'
-  prompt: >-
-    Täydennä alku ja loppu lyhyesti.
-    Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
-  answer: paavi, ada, lada, ada, ivaap.
-  is_correct: false
-  duration_seconds: 13.87
-  metadata:
-    input_tokens: 225
-    output_tokens: 2819
-    cost_usd: 0.007115
-    cost_source: litellm
 - timestamp: '2025-11-26T07:32:53Z'
   prompt: 'Täytä keskelle yksi sana: Niskasta _______, tukat saksin.'
   answer: niskasta taksin, tukat saksin.

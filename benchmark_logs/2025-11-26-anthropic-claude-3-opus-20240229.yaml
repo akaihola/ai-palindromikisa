@@ -141,18 +141,6 @@ tasks:
     output_tokens: 28
     cost_usd: 0.006195
     cost_source: litellm
-- timestamp: '2025-11-26T20:10:41Z'
-  prompt: >-
-    Täydennä alku ja loppu lyhyesti.
-    Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
-  answer: 'abbedissa lada-anja sanoi: "on niilo, nosta tasainen olento ja nasa jna-adal assi debba."'
-  is_correct: false
-  duration_seconds: 3.15
-  metadata:
-    input_tokens: 274
-    output_tokens: 56
-    cost_usd: 0.00831
-    cost_source: litellm
 - timestamp: '2025-11-26T20:10:44Z'
   prompt: 'Täytä keskelle yksi sana: Niskasta _______, tukat saksin.'
   answer: niskasta napattuna, tukat saksin.
