@@ -146,6 +146,7 @@ function renderScatterChart(canvasId, points, xLabel, yLabel, quadrant) {
     options: {
       responsive: true,
       maintainAspectRatio: true,
+      aspectRatio: 1,
       plugins: {
         legend: { display: false },
         tooltip: {
