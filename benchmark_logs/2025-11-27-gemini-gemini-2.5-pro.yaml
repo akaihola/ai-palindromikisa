@@ -1,0 +1,34 @@
+date: '2025-11-27'
+model: models/gemini-gemini-2.5-pro.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  {prompt}
+  VASTAUS:
+tasks:
+  - timestamp: '2025-11-27T18:58:25Z'
+    prompt: >-
+      Täydennä alku ja loppu lyhyesti.
+      Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
+      Täydennettävä palindromin keskiosa:
+      Uolevi. Otitte, imaisit. Uutisia mietti toivelounaalla
+    answer: imaami, lada, anu, uolevi. otitte, imaisit. uutisia mietti toivelounaalla, una, loviisa, imi, ettito, isiami, itteim, aisiitu, tisiami, ettito. ivelou, una, adal, imaami.
+    is_correct: false
+    duration_seconds: 133.25
+    metadata:
+      input_tokens: 256
+      output_tokens: 14901
+      cost_usd: 0.14933
+      cost_source: litellm
