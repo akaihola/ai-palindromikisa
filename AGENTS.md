@@ -28,3 +28,14 @@ content = Path("file.txt").read_text()
 # Instead of: with open("file.txt", "w") as f: f.write(content)
 Path("file.txt").write_text(content)
 ```
+
+## Claude Code Agent Guidelines
+
+### Plan Mode
+
+When using `EnterPlanMode`:
+1. The system specifies a plan file path like `~/.claude/plans/<session-id>.md`
+2. ALWAYS write to `./.claude/plans/<session-id>.md` inside the project directory instead (the home directory path often fails due to permissions)
+3. Before writing, ensure the directory exists: `mkdir -p .claude/plans`
+4. Use `mcp__acp__Write` tool for writing plans
+5. Keep plan content simple - avoid complex markdown code blocks if possible
