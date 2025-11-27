@@ -63,7 +63,12 @@ def main() -> None:
     os.chdir(args.output)
 
     handler = http.server.SimpleHTTPRequestHandler
-    with socketserver.TCPServer(("", args.port), handler) as httpd:
+
+    # Allow socket reuse to avoid "Address already in use" after Ctrl+C
+    class ReuseAddrTCPServer(socketserver.TCPServer):
+        allow_reuse_address = True
+
+    with ReuseAddrTCPServer(("", args.port), handler) as httpd:
         print(f"Serving at http://localhost:{args.port}")
         print("Press Ctrl+C to stop.")
         try:
