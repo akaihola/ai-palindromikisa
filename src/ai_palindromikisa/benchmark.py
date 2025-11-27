@@ -32,6 +32,32 @@ def extract_palindrome(text):
     return text.strip()
 
 
+def truncate_long_response(response_text: str, reference: str) -> str:
+    """Truncate response if longer than 1000 chars or 5x reference length.
+
+    Args:
+        response_text: The extracted palindrome response.
+        reference: The correct reference answer.
+
+    Returns:
+        Original text if under threshold, otherwise truncated with indicator.
+    """
+    threshold = max(1000, 5 * len(reference))
+    if len(response_text) <= threshold:
+        return response_text
+
+    # Keep 200 chars from start and end
+    start_chars = 200
+    end_chars = 200
+    truncated_count = len(response_text) - start_chars - end_chars
+
+    return (
+        f"{response_text[:start_chars]}..."
+        f"[{truncated_count} chars truncated]..."
+        f"{response_text[-end_chars:]}"
+    )
+
+
 def normalize_text(text):
     """Normalize text by removing punctuation and converting to lowercase for comparison."""
     # Remove punctuation (commas, periods, exclamation marks, question marks, etc.)
@@ -102,6 +128,7 @@ def run_benchmark_for_config(
             response = model.prompt(full_prompt)
 
         response_text = extract_palindrome(response.text()).strip().lower()
+        response_text = truncate_long_response(response_text, reference)
         # Note: response_json is only populated after .text() consumes the stream
         response_json = response.response_json or {}
 
