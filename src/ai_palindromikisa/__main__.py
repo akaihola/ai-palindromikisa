@@ -14,6 +14,7 @@ import sys
 
 # Import the main functions from our modules
 from .benchmark import main as benchmark_main
+from .delete_task import main as delete_task_main
 from .export_json import main as export_json_main
 from .extract_models import main as extract_models_main
 from .migrate import main as migrate_main
@@ -27,7 +28,7 @@ def main():
     if len(sys.argv) < 2:
         print(
             "Usage: ai-palindromikisa "
-            "{benchmark,stats,tasks,export-json,serve,update-pricing,migrate} [options]"
+            "{benchmark,stats,tasks,export-json,serve,update-pricing,migrate,delete-task} [options]"
         )
         print("  benchmark       Run palindrome benchmark tasks")
         print("  stats           Extract and display statistics from benchmark logs")
@@ -36,11 +37,13 @@ def main():
         print("  serve           Build and serve web interface locally")
         print("  update-pricing  Update pricing cache from LiteLLM repository")
         print("  migrate         Migrate files to new option-based naming convention")
+        print("  delete-task     Delete task runs matching a search term")
         print()
         print("For help with a specific command:")
         print("  ai-palindromikisa benchmark --help")
         print("  ai-palindromikisa stats --help")
         print("  ai-palindromikisa migrate --help")
+        print("  ai-palindromikisa delete-task --help")
         sys.exit(1)
 
     command = sys.argv[1]
@@ -49,7 +52,7 @@ def main():
     if command in ["-h", "--help", "help"]:
         print(
             "Usage: ai-palindromikisa "
-            "{benchmark,stats,tasks,export-json,serve,update-pricing,migrate} [options]"
+            "{benchmark,stats,tasks,export-json,serve,update-pricing,migrate,delete-task} [options]"
         )
         print("  benchmark       Run palindrome benchmark tasks")
         print("  stats           Extract and display statistics from benchmark logs")
@@ -58,11 +61,13 @@ def main():
         print("  serve           Build and serve web interface locally")
         print("  update-pricing  Update pricing cache from LiteLLM repository")
         print("  migrate         Migrate files to new option-based naming convention")
+        print("  delete-task     Delete task runs matching a search term")
         print()
         print("For help with a specific command:")
         print("  ai-palindromikisa benchmark --help")
         print("  ai-palindromikisa stats --help")
         print("  ai-palindromikisa migrate --help")
+        print("  ai-palindromikisa delete-task --help")
         sys.exit(0)
 
     # Remove the script name from sys.argv so subcommands can parse their own arguments
@@ -87,11 +92,13 @@ def main():
                 sys.exit(1)
         elif command == "migrate":
             migrate_main()
+        elif command == "delete-task":
+            delete_task_main()
         else:
             print(f"Unknown command: {command}")
             print(
                 "Available commands: benchmark, stats, tasks, export-json, serve, "
-                "update-pricing, migrate"
+                "update-pricing, migrate, delete-task"
             )
             print()
             print("For help with a specific command:")
