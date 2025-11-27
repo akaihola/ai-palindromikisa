@@ -1,5 +1,5 @@
 def show_scores(correct, total_tasks_run, completed_prompts, existing_logs):
-    score = (correct / total_tasks_run) if total_tasks_run > 0 else 0
+    score = (correct / total_tasks_run * 100) if total_tasks_run > 0 else 0
     print(f"New tasks score: {correct}/{total_tasks_run} correct ({score:.1f}%)")
 
     # Calculate overall score including existing tasks
@@ -11,7 +11,9 @@ def show_scores(correct, total_tasks_run, completed_prompts, existing_logs):
         if task.get("is_correct", False)
     )
     overall_correct = existing_correct + correct
-    overall_score = (overall_correct / total_completed) if total_completed > 0 else 0
+    overall_score = (
+        (overall_correct / total_completed * 100) if total_completed > 0 else 0
+    )
     print(
         f"Overall score: {overall_correct}/{total_completed} correct ({overall_score:.1f}%)"
     )
