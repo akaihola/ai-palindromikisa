@@ -61,3 +61,10 @@ tasks:
       Poista yksi sana niin että jäljelle jää edelleen palindromi:
       Oi, sivele tällä televisio!
     reference: "Oi, sivele televisio!"
+  - prompt: "Täytä keskelle yksi sana: Otti haju ______. Ei enää nenuja, hitto!"
+    reference: "Otti haju nenään. Ei enää nenuja, hitto!"
+  - prompt: >-
+      Tee 'emo'-sanasta yhdyssanan jälkipuolisko.
+      Se on oltava jotain tiettyä eläinlajia edustava emo.
+      Muokattava palindromi: Nosta komeana emo! Katson.
+    reference: "Nosta komeana kanaemo! Katson."
