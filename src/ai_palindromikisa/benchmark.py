@@ -52,7 +52,7 @@ def run_benchmark_for_config(
     options_str = f" (options: {config.options})" if config.options else ""
     print(f"\n{separator}")
     print(f"Running benchmark for model: {config.name}{options_str}")
-    print(f"Variation index: {config.variation_index}")
+    print(f"Model file: {config.get_base_filename()}.yaml")
     print(separator)
 
     # Ensure model metadata file exists
@@ -158,17 +158,13 @@ def main() -> None:
     model_configs, limit = parse_cli_arguments()
 
     # For configs from CLI (not ALL), find or create matching model files
-    # Configs from ALL already have correct variation_index from the file
     resolved_configs = []
     for config in model_configs:
-        # Always resolve CLI configs (variation_index=1) to find matching options
-        # Configs from get_all_model_configs() already have the correct variation_index
         resolved_config = find_or_create_model_config(config.name, config.options)
         resolved_configs.append(resolved_config)
 
     config_names = [
-        f"{c.name} (v{c.variation_index})" + (f" {c.options}" if c.options else "")
-        for c in resolved_configs
+        c.name + (f" {c.options}" if c.options else "") for c in resolved_configs
     ]
     print(f"Running benchmark for models: {', '.join(config_names)}\n")
 
