@@ -15,20 +15,19 @@ import yaml
 from rich.console import Console
 from rich.table import Table
 
+from ai_palindromikisa.models import get_display_name_from_path
 from ai_palindromikisa.plots import show_all_plots
 
 
 def _extract_model_name(model_path: str) -> str:
-    """Extract model name from path (remove 'models/' prefix and version suffix)."""
-    if model_path.startswith("models/"):
-        model_name = model_path[7:]  # Remove 'models/' prefix
-        # Remove version suffix like '-1.yaml'
-        if model_name.endswith(".yaml"):
-            model_name = model_name[:-5]
-            if "-1" in model_name:
-                model_name = model_name.rsplit("-1", 1)[0]
-        return model_name
-    return model_path
+    """Extract model display name from path using model config.
+
+    Returns the llm library format with verbose options, e.g.:
+        "openrouter/x-ai/grok-4: temperature 1.0"
+
+    Falls back to cleaned filename if config can't be loaded.
+    """
+    return get_display_name_from_path(model_path)
 
 
 def extract_models_from_logs(benchmark_dir: str = "../../benchmark_logs") -> dict:

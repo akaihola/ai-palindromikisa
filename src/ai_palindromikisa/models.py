@@ -14,6 +14,21 @@ class ModelConfig:
     name: str
     options: dict[str, str | float | int | bool] = field(default_factory=dict)
 
+    def get_display_name(self) -> str:
+        """Get the display name in llm library format with verbose options.
+
+        Examples:
+            ModelConfig("openrouter/x-ai/grok-4") -> "openrouter/x-ai/grok-4"
+            ModelConfig("openrouter/x-ai/grok-4", {"temperature": 1.0})
+                -> "openrouter/x-ai/grok-4: temperature 1.0"
+            ModelConfig("gpt-4o-mini", {"temperature": 0.3, "top_p": 0.9})
+                -> "gpt-4o-mini: temperature 0.3, top_p 0.9"
+        """
+        if not self.options:
+            return self.name
+        options_str = ", ".join(f"{k} {v}" for k, v in sorted(self.options.items()))
+        return f"{self.name}: {options_str}"
+
     def get_base_filename(self) -> str:
         """Get the base filename (without extension) for this model config.
 
@@ -184,3 +199,58 @@ def ensure_model_metadata_exists(config: ModelConfig) -> Path:
 
     # Create the model metadata file
     return _create_model_file(config)
+
+
+def load_model_config_from_path(model_path: str) -> ModelConfig | None:
+    """Load a ModelConfig from a model path reference in benchmark logs.
+
+    Args:
+        model_path: Path like "models/openrouter-x-ai-grok-4-t1.yaml"
+
+    Returns:
+        ModelConfig if the file exists and is valid, None otherwise
+    """
+    # Handle relative path from benchmark logs
+    if model_path.startswith("models/"):
+        models_dir = Path(__file__).parent.parent.parent / "models"
+        model_file = models_dir / model_path[7:]  # Remove "models/" prefix
+    else:
+        model_file = Path(model_path)
+
+    if not model_file.exists():
+        return None
+
+    try:
+        yaml_obj = YAML()
+        model_data = yaml_obj.load(model_file.read_text(encoding="utf-8"))
+        model_name = model_data.get("name", "")
+        if not model_name:
+            return None
+        options = model_data.get("options", {}) or {}
+        return ModelConfig(name=model_name, options=options)
+    except Exception:
+        return None
+
+
+def get_display_name_from_path(model_path: str) -> str:
+    """Get a display name from a model path, loading config if available.
+
+    Args:
+        model_path: Path like "models/openrouter-x-ai-grok-4-t1.yaml"
+
+    Returns:
+        Display name like "openrouter/x-ai/grok-4: temperature 1.0"
+        Falls back to cleaned filename if config can't be loaded
+    """
+    config = load_model_config_from_path(model_path)
+    if config:
+        return config.get_display_name()
+
+    # Fallback: extract from filename
+    if model_path.startswith("models/"):
+        model_name = model_path[7:]
+    else:
+        model_name = model_path
+    if model_name.endswith(".yaml"):
+        model_name = model_name[:-5]
+    return model_name
