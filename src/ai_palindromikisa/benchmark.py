@@ -74,7 +74,18 @@ def normalize_text(text):
 def _is_transient_api_error(exception: BaseException) -> bool:
     """Check if exception is a transient API error that should be retried."""
     error_msg = str(exception).lower()
-    transient_indicators = ["retry", "rate limit", "timeout", "503", "502", "429"]
+    transient_indicators = [
+        "retry",
+        "rate limit",
+        "timeout",
+        "503",
+        "502",
+        "429",
+        "connection",
+        "incomplete",
+        "peer closed",
+        "chunked read",
+    ]
     return any(indicator in error_msg for indicator in transient_indicators)
 
 
