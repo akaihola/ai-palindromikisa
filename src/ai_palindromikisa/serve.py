@@ -1,9 +1,10 @@
-"""Local development server for the web interface."""
+"""Local development server for the web interface with live reload."""
 
-import http.server
+import json
 import shutil
-import socketserver
 from pathlib import Path
+
+from livereload import Server
 
 from ai_palindromikisa.export_json import export_json
 
@@ -13,8 +14,6 @@ def build_site(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Export JSON data
-    import json
-
     data = export_json()
     (output_dir / "data.json").write_text(
         json.dumps(data, indent=2, ensure_ascii=False)
@@ -28,12 +27,12 @@ def build_site(output_dir: Path) -> None:
 
 
 def main() -> None:
-    """Build site and start local development server."""
+    """Build site and start local development server with live reload."""
     import argparse
 
     parser = argparse.ArgumentParser(
         prog="ai-palindromikisa serve",
-        description="Build and serve the web interface locally",
+        description="Build and serve the web interface locally with live reload",
     )
     parser.add_argument(
         "-p", "--port", type=int, default=8000, help="Port to serve on (default: 8000)"
@@ -57,24 +56,26 @@ def main() -> None:
     if args.build_only:
         return
 
-    # Change to output directory and serve
-    import os
+    # Create livereload server
+    server = Server()
 
-    os.chdir(args.output)
+    # Watch benchmark_logs for changes and rebuild
+    benchmark_logs = Path("benchmark_logs")
+    if benchmark_logs.exists():
+        server.watch(
+            str(benchmark_logs / "*.yaml"),
+            lambda: build_site(args.output),
+        )
 
-    handler = http.server.SimpleHTTPRequestHandler
+    # Watch web source files for changes
+    web_dir = Path(__file__).parent / "web"
+    server.watch(str(web_dir / "*"), lambda: build_site(args.output))
 
-    # Allow socket reuse to avoid "Address already in use" after Ctrl+C
-    class ReuseAddrTCPServer(socketserver.TCPServer):
-        allow_reuse_address = True
+    print(f"Watching {benchmark_logs}/*.yaml and {web_dir}/* for changes...")
+    print("Press Ctrl+C to stop.")
 
-    with ReuseAddrTCPServer(("", args.port), handler) as httpd:
-        print(f"Serving at http://localhost:{args.port}")
-        print("Press Ctrl+C to stop.")
-        try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            print("\nStopped.")
+    # Serve the output directory with live reload
+    server.serve(root=str(args.output), port=args.port, open_url_delay=None)
 
 
 if __name__ == "__main__":
