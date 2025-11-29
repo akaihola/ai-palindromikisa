@@ -16,6 +16,15 @@ from ai_palindromikisa.models import (
 )
 
 
+@pytest.fixture
+def mock_models_dir(tmp_path: Path):
+    """Fixture that creates a temporary models directory and patches MODELS_DIR."""
+    models_dir = tmp_path / "models"
+    models_dir.mkdir()
+    with mock.patch.object(ai_palindromikisa.models, "MODELS_DIR", models_dir):
+        yield models_dir
+
+
 class TestModelConfig:
     """Tests for ModelConfig dataclass."""
 
@@ -143,23 +152,15 @@ class TestOptionsMatch:
 class TestGetAllModelConfigs:
     """Tests for get_all_model_configs function."""
 
-    def test_reads_model_files(self, tmp_path: Path):
+    def test_reads_model_files(self, mock_models_dir):
         """Test reading model configurations from files."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-
         # Create test model files with new naming convention
-        (models_dir / "test-model.yaml").write_text("name: test/model\n")
-        (models_dir / "test-model-t03.yaml").write_text(
+        (mock_models_dir / "test-model.yaml").write_text("name: test/model\n")
+        (mock_models_dir / "test-model-t03.yaml").write_text(
             "name: test/model\noptions:\n  temperature: 0.3\n"
         )
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            configs = get_all_model_configs()
+        configs = get_all_model_configs()
 
         assert len(configs) == 2
         # Configs are sorted by filename alphabetically
@@ -169,211 +170,119 @@ class TestGetAllModelConfigs:
         assert configs[1].name == "test/model"
         assert configs[1].options == {}
 
-    def test_empty_models_directory(self, tmp_path: Path):
+    def test_empty_models_directory(self, mock_models_dir):
         """Test with empty models directory."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            configs = get_all_model_configs()
-
+        configs = get_all_model_configs()
         assert configs == []
 
 
 class TestFindOrCreateModelConfig:
     """Tests for find_or_create_model_config function."""
 
-    def test_finds_existing_config_without_options(self, tmp_path: Path):
+    def test_finds_existing_config_without_options(self, mock_models_dir):
         """Test finding existing model config without options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-        (models_dir / "test-model.yaml").write_text("name: test/model\n")
+        (mock_models_dir / "test-model.yaml").write_text("name: test/model\n")
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            config = find_or_create_model_config("test/model", {})
+        config = find_or_create_model_config("test/model", {})
 
         assert config.name == "test/model"
         assert config.options == {}
 
-    def test_finds_existing_config_with_matching_options(self, tmp_path: Path):
+    def test_finds_existing_config_with_matching_options(self, mock_models_dir):
         """Test finding existing model config with matching options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-        (models_dir / "test-model.yaml").write_text("name: test/model\n")
-        (models_dir / "test-model-t03.yaml").write_text(
+        (mock_models_dir / "test-model.yaml").write_text("name: test/model\n")
+        (mock_models_dir / "test-model-t03.yaml").write_text(
             "name: test/model\noptions:\n  temperature: 0.3\n"
         )
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            config = find_or_create_model_config("test/model", {"temperature": 0.3})
+        config = find_or_create_model_config("test/model", {"temperature": 0.3})
 
         assert config.name == "test/model"
         assert config.options == {"temperature": 0.3}
 
-    def test_creates_new_config_for_new_options(self, tmp_path: Path):
+    def test_creates_new_config_for_new_options(self, mock_models_dir):
         """Test creating new model config for new options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-        (models_dir / "test-model.yaml").write_text("name: test/model\n")
+        (mock_models_dir / "test-model.yaml").write_text("name: test/model\n")
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            config = find_or_create_model_config("test/model", {"temperature": 0.5})
+        config = find_or_create_model_config("test/model", {"temperature": 0.5})
 
         assert config.name == "test/model"
         assert config.options == {"temperature": 0.5}
         # Verify file was created with option suffix
-        assert (models_dir / "test-model-t05.yaml").exists()
+        assert (mock_models_dir / "test-model-t05.yaml").exists()
 
-    def test_creates_first_config_for_new_model_with_options(self, tmp_path: Path):
+    def test_creates_first_config_for_new_model_with_options(self, mock_models_dir):
         """Test creating first model config for new model with options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            config = find_or_create_model_config("new/model", {"temperature": 0.3})
+        config = find_or_create_model_config("new/model", {"temperature": 0.3})
 
         assert config.name == "new/model"
         assert config.options == {"temperature": 0.3}
         # Verify file was created with option suffix
-        assert (models_dir / "new-model-t03.yaml").exists()
+        assert (mock_models_dir / "new-model-t03.yaml").exists()
 
-    def test_creates_first_config_for_new_model_without_options(self, tmp_path: Path):
+    def test_creates_first_config_for_new_model_without_options(self, mock_models_dir):
         """Test creating first model config for new model without options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            config = find_or_create_model_config("new/model", {})
+        config = find_or_create_model_config("new/model", {})
 
         assert config.name == "new/model"
         assert config.options == {}
         # Verify file was created without suffix
-        assert (models_dir / "new-model.yaml").exists()
+        assert (mock_models_dir / "new-model.yaml").exists()
 
-    def test_raises_error_on_options_mismatch(self, tmp_path: Path):
+    def test_raises_error_on_options_mismatch(self, mock_models_dir):
         """Test that ValueError is raised when file exists with different options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
         # Create file with different options than what we'll request
-        (models_dir / "test-model-t03.yaml").write_text(
+        (mock_models_dir / "test-model-t03.yaml").write_text(
             "name: test/model\noptions:\n  temperature: 0.5\n"
         )
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            with pytest.raises(ValueError, match="different options"):
-                find_or_create_model_config("test/model", {"temperature": 0.3})
+        with pytest.raises(ValueError, match="different options"):
+            find_or_create_model_config("test/model", {"temperature": 0.3})
 
 
 class TestLoadModelConfigFromPath:
     """Tests for load_model_config_from_path function."""
 
-    def test_loads_config_without_options(self, tmp_path: Path):
+    def test_loads_config_without_options(self, mock_models_dir):
         """Test loading model config without options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-        (models_dir / "gpt-4o-mini.yaml").write_text("name: gpt-4o-mini\n")
+        (mock_models_dir / "gpt-4o-mini.yaml").write_text("name: gpt-4o-mini\n")
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            config = load_model_config_from_path("models/gpt-4o-mini.yaml")
+        config = load_model_config_from_path("models/gpt-4o-mini.yaml")
 
         assert config is not None
         assert config.name == "gpt-4o-mini"
         assert config.options == {}
 
-    def test_loads_config_with_options(self, tmp_path: Path):
+    def test_loads_config_with_options(self, mock_models_dir):
         """Test loading model config with options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-        (models_dir / "openrouter-x-ai-grok-4-t1.yaml").write_text(
+        (mock_models_dir / "openrouter-x-ai-grok-4-t1.yaml").write_text(
             "name: openrouter/x-ai/grok-4\noptions:\n  temperature: 1.0\n"
         )
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            config = load_model_config_from_path(
-                "models/openrouter-x-ai-grok-4-t1.yaml"
-            )
+        config = load_model_config_from_path("models/openrouter-x-ai-grok-4-t1.yaml")
 
         assert config is not None
         assert config.name == "openrouter/x-ai/grok-4"
         assert config.options == {"temperature": 1.0}
 
-    def test_returns_none_for_missing_file(self, tmp_path: Path):
+    def test_returns_none_for_missing_file(self, mock_models_dir):
         """Test returns None when model file doesn't exist."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            config = load_model_config_from_path("models/nonexistent.yaml")
-
+        config = load_model_config_from_path("models/nonexistent.yaml")
         assert config is None
 
-    def test_returns_none_for_invalid_yaml(self, tmp_path: Path):
+    def test_returns_none_for_invalid_yaml(self, mock_models_dir):
         """Test returns None when YAML is invalid."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-        (models_dir / "invalid.yaml").write_text("invalid: yaml: content:")
+        (mock_models_dir / "invalid.yaml").write_text("invalid: yaml: content:")
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            config = load_model_config_from_path("models/invalid.yaml")
+        config = load_model_config_from_path("models/invalid.yaml")
 
         assert config is None
 
-    def test_returns_none_for_missing_name_field(self, tmp_path: Path):
+    def test_returns_none_for_missing_name_field(self, mock_models_dir):
         """Test returns None when name field is missing."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-        (models_dir / "no-name.yaml").write_text("options:\n  temperature: 0.5\n")
+        (mock_models_dir / "no-name.yaml").write_text("options:\n  temperature: 0.5\n")
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            config = load_model_config_from_path("models/no-name.yaml")
+        config = load_model_config_from_path("models/no-name.yaml")
 
         assert config is None
 
@@ -381,85 +290,48 @@ class TestLoadModelConfigFromPath:
 class TestGetDisplayNameFromPath:
     """Tests for get_display_name_from_path function."""
 
-    def test_returns_display_name_without_options(self, tmp_path: Path):
+    def test_returns_display_name_without_options(self, mock_models_dir):
         """Test display name from path without options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-        (models_dir / "gpt-4o-mini.yaml").write_text("name: gpt-4o-mini\n")
+        (mock_models_dir / "gpt-4o-mini.yaml").write_text("name: gpt-4o-mini\n")
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            display_name = get_display_name_from_path("models/gpt-4o-mini.yaml")
+        display_name = get_display_name_from_path("models/gpt-4o-mini.yaml")
 
         assert display_name == "gpt-4o-mini"
 
-    def test_returns_display_name_with_options(self, tmp_path: Path):
+    def test_returns_display_name_with_options(self, mock_models_dir):
         """Test display name from path with options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-        (models_dir / "openrouter-x-ai-grok-4-t1.yaml").write_text(
+        (mock_models_dir / "openrouter-x-ai-grok-4-t1.yaml").write_text(
             "name: openrouter/x-ai/grok-4\noptions:\n  temperature: 1.0\n"
         )
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            display_name = get_display_name_from_path(
-                "models/openrouter-x-ai-grok-4-t1.yaml"
-            )
+        display_name = get_display_name_from_path(
+            "models/openrouter-x-ai-grok-4-t1.yaml"
+        )
 
         assert display_name == "openrouter/x-ai/grok-4: temperature 1.0"
 
-    def test_returns_display_name_with_multiple_options(self, tmp_path: Path):
+    def test_returns_display_name_with_multiple_options(self, mock_models_dir):
         """Test display name from path with multiple options."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-        (models_dir / "test-model.yaml").write_text(
+        (mock_models_dir / "test-model.yaml").write_text(
             "name: test/model\noptions:\n  temperature: 0.7\n  top_p: 0.9\n"
         )
 
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            display_name = get_display_name_from_path("models/test-model.yaml")
+        display_name = get_display_name_from_path("models/test-model.yaml")
 
         assert display_name == "test/model: temperature 0.7, top_p 0.9"
 
-    def test_fallback_for_missing_file(self, tmp_path: Path):
+    def test_fallback_for_missing_file(self, mock_models_dir):
         """Test fallback to cleaned filename when file doesn't exist."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            display_name = get_display_name_from_path(
-                "models/openrouter-x-ai-grok-4-t1.yaml"
-            )
+        display_name = get_display_name_from_path(
+            "models/openrouter-x-ai-grok-4-t1.yaml"
+        )
 
         # Falls back to cleaned filename (without models/ prefix and .yaml suffix)
         assert display_name == "openrouter-x-ai-grok-4-t1"
 
-    def test_fallback_for_path_without_models_prefix(self, tmp_path: Path):
+    def test_fallback_for_path_without_models_prefix(self, mock_models_dir):
         """Test fallback when path doesn't have models/ prefix."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            display_name = get_display_name_from_path("some-model.yaml")
+        display_name = get_display_name_from_path("some-model.yaml")
 
         assert display_name == "some-model"
 
@@ -472,16 +344,8 @@ class TestGetDisplayNameFromPath:
             ("path/to/model.yaml", "path/to/model"),
         ],
     )
-    def test_fallback_parametrized(self, path, expected, tmp_path: Path):
+    def test_fallback_parametrized(self, path, expected, mock_models_dir):
         """Test fallback behavior for various paths when files don't exist."""
-        models_dir = tmp_path / "models"
-        models_dir.mkdir()
-
-        with mock.patch.object(
-            ai_palindromikisa.models,
-            "__file__",
-            str(tmp_path / "src" / "ai_palindromikisa" / "models.py"),
-        ):
-            display_name = get_display_name_from_path(path)
+        display_name = get_display_name_from_path(path)
 
         assert display_name == expected

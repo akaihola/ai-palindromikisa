@@ -6,7 +6,6 @@ This script parses YAML files in the benchmark_logs directory to extract model i
 
 from collections import defaultdict
 from datetime import datetime
-from pathlib import Path
 from typing import cast
 
 import plotext as plt
@@ -15,6 +14,7 @@ from rich.console import Console
 from rich.table import Table
 
 from ai_palindromikisa.models import get_display_name_from_path
+from ai_palindromikisa.paths import BENCHMARK_LOGS_DIR
 from ai_palindromikisa.plots import show_all_plots
 
 
@@ -29,7 +29,7 @@ def _extract_model_name(model_path: str) -> str:
     return get_display_name_from_path(model_path)
 
 
-def extract_models_from_logs(benchmark_dir: str = "../../benchmark_logs") -> dict:
+def extract_models_from_logs() -> dict:
     """Extract model information from all YAML files in benchmark directory.
 
     Returns a dict with:
@@ -37,12 +37,8 @@ def extract_models_from_logs(benchmark_dir: str = "../../benchmark_logs") -> dic
         - total_cost: total cost across all tasks
         - log_count: number of log files processed
     """
-    # Get the script's directory and make benchmark_logs path relative to it
-    script_dir = Path(__file__).parent.parent.parent
-    benchmark_path = script_dir / "benchmark_logs"
-
-    if not benchmark_path.exists():
-        print(f"Error: Benchmark directory '{benchmark_dir}' not found.")
+    if not BENCHMARK_LOGS_DIR.exists():
+        print(f"Error: Benchmark directory '{BENCHMARK_LOGS_DIR}' not found.")
         return {"models": {}, "total_cost": 0.0, "log_count": 0}
 
     # Aggregate by unique model name
@@ -59,10 +55,10 @@ def extract_models_from_logs(benchmark_dir: str = "../../benchmark_logs") -> dic
     total_cost = 0.0
 
     # Find all YAML files in the benchmark directory
-    yaml_files = list(benchmark_path.glob("*.yaml"))
+    yaml_files = list(BENCHMARK_LOGS_DIR.glob("*.yaml"))
 
     if not yaml_files:
-        print(f"No YAML files found in '{benchmark_dir}'.")
+        print(f"No YAML files found in '{BENCHMARK_LOGS_DIR}'.")
         return {"models": {}, "total_cost": 0.0, "log_count": 0}
 
     for yaml_file in sorted(yaml_files):

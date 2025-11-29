@@ -5,6 +5,7 @@ import shutil
 from pathlib import Path
 
 from ai_palindromikisa.export_json import export_json
+from ai_palindromikisa.paths import BENCHMARK_LOGS_DIR, WEB_DIR
 
 
 def build_site(output_dir: Path) -> None:
@@ -18,8 +19,7 @@ def build_site(output_dir: Path) -> None:
     )
 
     # Copy static files
-    web_dir = Path(__file__).parent / "web"
-    for file in web_dir.iterdir():
+    for file in WEB_DIR.iterdir():
         if file.is_file():
             shutil.copy(file, output_dir / file.name)
 
@@ -47,18 +47,16 @@ def serve_site(port: int, build_only: bool, output: str) -> None:
     server = Server()
 
     # Watch benchmark_logs for changes and rebuild
-    benchmark_logs = Path("benchmark_logs")
-    if benchmark_logs.exists():
+    if BENCHMARK_LOGS_DIR.exists():
         server.watch(
-            str(benchmark_logs / "*.yaml"),
+            str(BENCHMARK_LOGS_DIR / "*.yaml"),
             lambda: build_site(output_path),
         )
 
     # Watch web source files for changes
-    web_dir = Path(__file__).parent / "web"
-    server.watch(str(web_dir / "*"), lambda: build_site(output_path))
+    server.watch(str(WEB_DIR / "*"), lambda: build_site(output_path))
 
-    print(f"Watching {benchmark_logs}/*.yaml and {web_dir}/* for changes...")
+    print(f"Watching {BENCHMARK_LOGS_DIR}/*.yaml and {WEB_DIR}/* for changes...")
     print("Press Ctrl+C to stop.")
 
     # Serve the output directory with live reload

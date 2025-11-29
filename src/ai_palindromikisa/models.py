@@ -5,6 +5,7 @@ from pathlib import Path
 from ruamel.yaml import YAML
 
 from ai_palindromikisa.option_suffix import generate_option_suffix
+from ai_palindromikisa.paths import MODELS_DIR
 
 
 @dataclass
@@ -43,23 +44,20 @@ class ModelConfig:
 
     def get_model_file_path(self) -> Path:
         """Get the path to the model metadata file."""
-        models_dir = Path(__file__).parent.parent.parent / "models"
-        return models_dir / f"{self.get_base_filename()}.yaml"
+        return MODELS_DIR / f"{self.get_base_filename()}.yaml"
 
 
 def get_all_model_configs() -> list[ModelConfig]:
     """Extract model configurations from model files in the models directory."""
-    models_dir = Path(__file__).parent.parent.parent / "models"
-
-    if not models_dir.exists():
-        print(f"Warning: Models directory '{models_dir}' not found.")
+    if not MODELS_DIR.exists():
+        print(f"Warning: Models directory '{MODELS_DIR}' not found.")
         print("Please create the models directory and add model configuration files.")
         return []
 
     configs = []
     model_files_found = 0
 
-    for model_file in sorted(models_dir.glob("*.yaml")):
+    for model_file in sorted(MODELS_DIR.glob("*.yaml")):
         if model_file.name == "README.md":
             continue
         model_files_found += 1
@@ -212,8 +210,7 @@ def load_model_config_from_path(model_path: str) -> ModelConfig | None:
     """
     # Handle relative path from benchmark logs
     if model_path.startswith("models/"):
-        models_dir = Path(__file__).parent.parent.parent / "models"
-        model_file = models_dir / model_path[7:]  # Remove "models/" prefix
+        model_file = MODELS_DIR / model_path[7:]  # Remove "models/" prefix
     else:
         model_file = Path(model_path)
 

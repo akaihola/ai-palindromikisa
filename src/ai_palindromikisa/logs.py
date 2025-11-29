@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 
 from ruamel.yaml import YAML
 
+from ai_palindromikisa.paths import BENCHMARK_LOGS_DIR
+
 if TYPE_CHECKING:
     from ai_palindromikisa.models import ModelConfig
 
@@ -14,10 +16,7 @@ def get_existing_logs(config: "ModelConfig", system_prompt: str) -> list:
 
     Matches logs by the model file reference (which includes variation index).
     """
-    # Get benchmark_logs directory path
-    logs_dir = Path(__file__).parent.parent.parent / "benchmark_logs"
-
-    if not logs_dir.exists():
+    if not BENCHMARK_LOGS_DIR.exists():
         return []
 
     # The expected model file path reference in logs
@@ -26,7 +25,7 @@ def get_existing_logs(config: "ModelConfig", system_prompt: str) -> list:
     expected_log_suffix = f"-{config.get_base_filename()}.yaml"
 
     existing_logs = []
-    for log_file in logs_dir.glob("*.yaml"):
+    for log_file in BENCHMARK_LOGS_DIR.glob("*.yaml"):
         try:
             yaml_obj = YAML()
             log_data = yaml_obj.load(log_file.read_text(encoding="utf-8"))
@@ -110,13 +109,12 @@ def get_log_path(config: "ModelConfig") -> Path:
     """Get the path to today's log file for the given model configuration."""
     # Generate filename with date and model config base filename
     date_str = datetime.now().strftime("%Y-%m-%d")
-    log_filename = f"benchmark_logs/{date_str}-{config.get_base_filename()}.yaml"
+    log_filename = f"{date_str}-{config.get_base_filename()}.yaml"
 
     # Create benchmark_logs directory if it doesn't exist
-    log_path = Path(__file__).parent.parent.parent / log_filename
-    log_path.parent.mkdir(parents=True, exist_ok=True)
+    BENCHMARK_LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
-    return log_path
+    return BENCHMARK_LOGS_DIR / log_filename
 
 
 def save_task_result(

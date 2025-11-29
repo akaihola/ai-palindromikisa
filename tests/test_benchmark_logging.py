@@ -8,6 +8,7 @@ import pytest
 import yaml
 
 import ai_palindromikisa.logs
+import ai_palindromikisa.paths
 from ai_palindromikisa.logs import get_existing_logs, get_log_path, save_task_result
 from ai_palindromikisa.models import ModelConfig
 
@@ -34,12 +35,11 @@ class TestGetLogPath:
         """Test that log path includes option-based suffix."""
         config = ModelConfig(name=name, options=options)
 
-        src_dir = tmp_path / "src" / "ai_palindromikisa"
-        src_dir.mkdir(parents=True, exist_ok=True)
-        logs_file = src_dir / "logs.py"
-        logs_file.write_text("# dummy file")
+        benchmark_logs_dir = tmp_path / "benchmark_logs"
 
-        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
+        with mock.patch.object(
+            ai_palindromikisa.logs, "BENCHMARK_LOGS_DIR", benchmark_logs_dir
+        ):
             log_path = get_log_path(config)
 
         assert log_path.name.endswith(expected_suffix)
@@ -81,14 +81,12 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
         """Test log file creation with real file system operations."""
         config = ModelConfig(name="test/test-model")
 
-        # Create a temporary logs.py file in the expected location
-        src_dir = tmp_path / "src" / "ai_palindromikisa"
-        src_dir.mkdir(parents=True, exist_ok=True)
-        logs_file = src_dir / "logs.py"
-        logs_file.write_text("# dummy file")
+        benchmark_logs_dir = tmp_path / "benchmark_logs"
 
-        # Patch the __file__ path to use our temp directory
-        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
+        # Patch the BENCHMARK_LOGS_DIR to use our temp directory
+        with mock.patch.object(
+            ai_palindromikisa.logs, "BENCHMARK_LOGS_DIR", benchmark_logs_dir
+        ):
             # Create the log file
             log_path = save_task_result(
                 config,
@@ -167,13 +165,11 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
             options={"temperature": 0.3},
         )
 
-        # Create temporary logs.py
-        src_dir = tmp_path / "src" / "ai_palindromikisa"
-        src_dir.mkdir(parents=True, exist_ok=True)
-        logs_file = src_dir / "logs.py"
-        logs_file.write_text("# dummy file")
+        benchmark_logs_dir = tmp_path / "benchmark_logs"
 
-        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
+        with mock.patch.object(
+            ai_palindromikisa.logs, "BENCHMARK_LOGS_DIR", benchmark_logs_dir
+        ):
             # Create the log file
             log_path = save_task_result(
                 config,
@@ -198,17 +194,13 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
         """Test that the benchmark_logs directory is created if it doesn't exist."""
         config = ModelConfig(name="test/model")
 
-        # Create temporary logs.py
-        src_dir = tmp_path / "src" / "ai_palindromikisa"
-        src_dir.mkdir(parents=True, exist_ok=True)
-        logs_file = src_dir / "logs.py"
-        logs_file.write_text("# dummy file")
+        # Don't create benchmark_logs directory beforehand
+        benchmark_logs_dir = tmp_path / "benchmark_logs"
+        assert not benchmark_logs_dir.exists()
 
-        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
-            # Don't create benchmark_logs directory beforehand
-            benchmark_logs_dir = tmp_path / "benchmark_logs"
-            assert not benchmark_logs_dir.exists()
-
+        with mock.patch.object(
+            ai_palindromikisa.logs, "BENCHMARK_LOGS_DIR", benchmark_logs_dir
+        ):
             # Create the log file
             log_path = save_task_result(
                 config,
@@ -249,13 +241,11 @@ Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
         """Test that log filename includes option-based suffix."""
         config = ModelConfig(name="test/test-model", options=options)
 
-        # Create temporary logs.py
-        src_dir = tmp_path / "src" / "ai_palindromikisa"
-        src_dir.mkdir(parents=True, exist_ok=True)
-        logs_file = src_dir / "logs.py"
-        logs_file.write_text("# dummy file")
+        benchmark_logs_dir = tmp_path / "benchmark_logs"
 
-        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
+        with mock.patch.object(
+            ai_palindromikisa.logs, "BENCHMARK_LOGS_DIR", benchmark_logs_dir
+        ):
             log_path = save_task_result(
                 config,
                 mock_system_prompt,
@@ -289,11 +279,6 @@ class TestGetExistingLogs:
         """Test matching logs by model field in YAML."""
         config = ModelConfig(name="test/model", options={"temperature": 0.3})
 
-        src_dir = tmp_path / "src" / "ai_palindromikisa"
-        src_dir.mkdir(parents=True, exist_ok=True)
-        logs_file = src_dir / "logs.py"
-        logs_file.write_text("# dummy file")
-
         logs_dir = tmp_path / "benchmark_logs"
         logs_dir.mkdir()
 
@@ -317,7 +302,9 @@ class TestGetExistingLogs:
             yaml.dump(log_content_no_opts)
         )
 
-        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
+        with mock.patch.object(
+            ai_palindromikisa.logs, "BENCHMARK_LOGS_DIR", logs_dir
+        ):
             logs = get_existing_logs(config, mock_system_prompt)
 
         assert len(logs) == 1
@@ -326,11 +313,6 @@ class TestGetExistingLogs:
     def test_matches_by_filename_pattern(self, tmp_path: Path, mock_system_prompt):
         """Test matching logs by filename pattern."""
         config = ModelConfig(name="test/model")
-
-        src_dir = tmp_path / "src" / "ai_palindromikisa"
-        src_dir.mkdir(parents=True, exist_ok=True)
-        logs_file = src_dir / "logs.py"
-        logs_file.write_text("# dummy file")
 
         logs_dir = tmp_path / "benchmark_logs"
         logs_dir.mkdir()
@@ -344,7 +326,9 @@ class TestGetExistingLogs:
         }
         (logs_dir / "2025-01-01-test-model.yaml").write_text(yaml.dump(log_content))
 
-        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
+        with mock.patch.object(
+            ai_palindromikisa.logs, "BENCHMARK_LOGS_DIR", logs_dir
+        ):
             logs = get_existing_logs(config, mock_system_prompt)
 
         assert len(logs) == 1
@@ -352,11 +336,6 @@ class TestGetExistingLogs:
     def test_filters_by_system_prompt(self, tmp_path: Path, mock_system_prompt):
         """Test that logs are filtered by system prompt."""
         config = ModelConfig(name="test/model")
-
-        src_dir = tmp_path / "src" / "ai_palindromikisa"
-        src_dir.mkdir(parents=True, exist_ok=True)
-        logs_file = src_dir / "logs.py"
-        logs_file.write_text("# dummy file")
 
         logs_dir = tmp_path / "benchmark_logs"
         logs_dir.mkdir()
@@ -379,7 +358,9 @@ class TestGetExistingLogs:
         }
         (logs_dir / "2025-01-02-test-model.yaml").write_text(yaml.dump(log_different))
 
-        with mock.patch.object(ai_palindromikisa.logs, "__file__", str(logs_file)):
+        with mock.patch.object(
+            ai_palindromikisa.logs, "BENCHMARK_LOGS_DIR", logs_dir
+        ):
             logs = get_existing_logs(config, mock_system_prompt)
 
         assert len(logs) == 1

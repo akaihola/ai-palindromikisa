@@ -1,7 +1,6 @@
 """Task statistics module for displaying benchmark task performance across models."""
 
 from collections import defaultdict
-from pathlib import Path
 from typing import cast
 
 import yaml
@@ -9,6 +8,7 @@ from rich.console import Console
 from rich.table import Table
 
 from ai_palindromikisa.models import get_display_name_from_path
+from ai_palindromikisa.paths import BENCHMARK_LOGS_DIR
 from ai_palindromikisa.plots import (
     FALLBACK_RICH_COLORS,
     MODEL_COLOR_PATTERNS,
@@ -56,10 +56,7 @@ def load_task_stats() -> dict:
         - marker_map: dict mapping model name to marker
         - color_map: dict mapping model name to rich color
     """
-    script_dir = Path(__file__).parent.parent.parent
-    benchmark_path = script_dir / "benchmark_logs"
-
-    if not benchmark_path.exists():
+    if not BENCHMARK_LOGS_DIR.exists():
         return {"tasks": {}, "models": [], "marker_map": {}, "color_map": {}}
 
     # Load reference tasks to get correct answers
@@ -82,7 +79,7 @@ def load_task_stats() -> dict:
     all_models: set[str] = set()
     model_success_counts: dict[str, tuple[int, int]] = defaultdict(lambda: (0, 0))
 
-    yaml_files = list(benchmark_path.glob("*.yaml"))
+    yaml_files = list(BENCHMARK_LOGS_DIR.glob("*.yaml"))
 
     for yaml_file in sorted(yaml_files):
         try:

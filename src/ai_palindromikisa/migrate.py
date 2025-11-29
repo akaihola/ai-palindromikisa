@@ -6,11 +6,7 @@ from pathlib import Path
 from ruamel.yaml import YAML
 
 from ai_palindromikisa.option_suffix import generate_option_suffix
-
-
-def get_project_root() -> Path:
-    """Get the project root directory."""
-    return Path(__file__).parent.parent.parent
+from ai_palindromikisa.paths import BENCHMARK_LOGS_DIR, MODELS_DIR
 
 
 def migrate_files(dry_run: bool = False) -> None:
@@ -22,10 +18,6 @@ def migrate_files(dry_run: bool = False) -> None:
     Args:
         dry_run: If True, only print what would be done without making changes
     """
-    project_root = get_project_root()
-    models_dir = project_root / "models"
-    logs_dir = project_root / "benchmark_logs"
-
     if dry_run:
         print("DRY RUN - No changes will be made\n")
 
@@ -34,8 +26,8 @@ def migrate_files(dry_run: bool = False) -> None:
 
     # Step 1: Process model files
     print("=== Processing model files ===\n")
-    if models_dir.exists():
-        for model_file in sorted(models_dir.glob("*.yaml")):
+    if MODELS_DIR.exists():
+        for model_file in sorted(MODELS_DIR.glob("*.yaml")):
             result = _process_model_file(model_file, dry_run)
             if result:
                 old_ref, new_ref = result
@@ -43,8 +35,8 @@ def migrate_files(dry_run: bool = False) -> None:
 
     # Step 2: Process log files
     print("\n=== Processing log files ===\n")
-    if logs_dir.exists():
-        for log_file in sorted(logs_dir.glob("*.yaml")):
+    if BENCHMARK_LOGS_DIR.exists():
+        for log_file in sorted(BENCHMARK_LOGS_DIR.glob("*.yaml")):
             _process_log_file(log_file, model_renames, dry_run)
 
     if dry_run:

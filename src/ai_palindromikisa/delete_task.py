@@ -1,16 +1,11 @@
 """Delete task runs from benchmark logs based on search term matching."""
 
 from io import StringIO
-from pathlib import Path
 
 from ruamel.yaml import YAML
 
+from ai_palindromikisa.paths import BENCHMARK_LOGS_DIR
 from ai_palindromikisa.tasks import load_tasks
-
-
-def get_project_root() -> Path:
-    """Get the project root directory."""
-    return Path(__file__).parent.parent.parent
 
 
 def find_matching_tasks(search_term: str) -> list[dict]:
@@ -47,12 +42,9 @@ def delete_task_runs(
     Returns:
         Statistics dict with files_scanned, files_modified, tasks_deleted
     """
-    project_root = get_project_root()
-    logs_dir = project_root / "benchmark_logs"
-
     stats = {"files_scanned": 0, "files_modified": 0, "tasks_deleted": 0}
 
-    if not logs_dir.exists():
+    if not BENCHMARK_LOGS_DIR.exists():
         return stats
 
     yaml_obj = YAML()
@@ -61,7 +53,7 @@ def delete_task_runs(
     yaml_obj.allow_unicode = True
     yaml_obj.width = 4096
 
-    for log_file in sorted(logs_dir.glob("*.yaml")):
+    for log_file in sorted(BENCHMARK_LOGS_DIR.glob("*.yaml")):
         stats["files_scanned"] += 1
 
         try:
