@@ -168,3 +168,17 @@ def update_pricing_cache() -> bool:
     if github_data is None:
         return False
     return save_pricing_to_cache(github_data)
+
+
+def update_pricing_cli() -> None:
+    """CLI entry point to update pricing cache from LiteLLM repository.
+
+    Prints status and exits with code 1 on failure.
+    """
+    import sys
+
+    if update_pricing_cache():
+        print("Updated pricing data from LiteLLM repository")
+    else:
+        print("Failed to update pricing data from LiteLLM repository")
+        sys.exit(1)

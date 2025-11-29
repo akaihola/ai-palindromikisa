@@ -1,5 +1,7 @@
 """Export benchmark statistics as JSON for web visualization."""
 
+import json
+import sys
 from datetime import datetime, timezone
 
 from ai_palindromikisa.extract_models import extract_models_from_logs
@@ -221,3 +223,10 @@ def export_json() -> dict:
         },
         "chart_data": chart_data,
     }
+
+
+def export_json_to_stdout() -> None:
+    """Export statistics as JSON to stdout."""
+    data = export_json()
+    json.dump(data, sys.stdout, indent=2, ensure_ascii=False)
+    print()  # Add trailing newline

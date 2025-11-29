@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import re
+import sys
 import time
 from datetime import datetime, timezone
 
@@ -16,9 +17,12 @@ from ai_palindromikisa.logs import (
 from ai_palindromikisa.models import (
     ModelConfig,
     ensure_model_metadata_exists,
+    find_or_create_model_config,
+    get_all_model_configs,
 )
 from ai_palindromikisa.pricing import get_request_cost
 from ai_palindromikisa.scores import show_scores
+from ai_palindromikisa.tasks import load_tasks
 
 
 def extract_palindrome(text):
@@ -207,3 +211,56 @@ def run_benchmark_for_config(
         print()
 
     show_scores(correct, total_tasks_run, completed_prompts, existing_logs)
+
+
+def run_benchmark(
+    models: tuple[str, ...],
+    options: dict[str, str | float | int | bool],
+    limit: int | None,
+) -> None:
+    """Run palindrome benchmark tasks.
+
+    Args:
+        models: Tuple of model names to benchmark. Empty for default,
+                ("ALL",) for all tested models, or specific model names.
+        options: Options to pass to the model (e.g., temperature).
+        limit: Limit the number of tasks to run per model.
+    """
+    # Handle models argument
+    if not models:
+        # Default to gemini/gemini-2.0-flash if no models specified
+        model_configs = [ModelConfig(name="gemini/gemini-2.0-flash", options=options)]
+    elif "ALL" in models:
+        # Get all tested models from model files
+        model_configs = get_all_model_configs()
+        if model_configs:
+            print(f"Found {len(model_configs)} model configurations")
+        else:
+            print("No model configuration files found in models directory.")
+            sys.exit(1)
+    else:
+        # Use explicitly specified models with the provided options
+        model_configs = [
+            ModelConfig(name=model_name, options=options) for model_name in models
+        ]
+
+    # For configs from CLI (not ALL), find or create matching model files
+    resolved_configs = []
+    for config in model_configs:
+        resolved_config = find_or_create_model_config(config.name, config.options)
+        resolved_configs.append(resolved_config)
+
+    config_names = [
+        c.name + (f" {c.options}" if c.options else "") for c in resolved_configs
+    ]
+    print(f"Running benchmark for models: {', '.join(config_names)}\n")
+
+    system_prompt, tasks = load_tasks()
+
+    # Apply limit if specified
+    if limit is not None:
+        tasks = tasks[:limit]
+
+    # Run benchmark for each model configuration
+    for config in resolved_configs:
+        run_benchmark_for_config(config, system_prompt, tasks)

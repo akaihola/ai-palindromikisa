@@ -92,3 +92,46 @@ def delete_task_runs(
                 log_file.write_text(string_stream.getvalue(), encoding="utf-8")
 
     return stats
+
+
+def delete_task_cli(search: str, force: bool) -> None:
+    """CLI entry point to delete task runs from benchmark logs matching a search term.
+
+    Args:
+        search: Search term to match in task prompt or reference (case-insensitive).
+        force: If True, actually delete. If False, dry-run only.
+    """
+    print(f'Searching for tasks matching: "{search}"')
+    print()
+
+    # Find matching tasks from task definitions
+    matching_tasks = find_matching_tasks(search)
+
+    if not matching_tasks:
+        print("No matching tasks found.")
+        return
+
+    print(f"Found {len(matching_tasks)} matching task(s):")
+    for task in matching_tasks:
+        print(f'  - Prompt: "{task["prompt"]}"')
+        print(f'    Reference: "{task["reference"]}"')
+    print()
+
+    dry_run = not force
+    if dry_run:
+        print("DRY RUN - No changes will be made")
+        print()
+
+    print("Scanning log files...")
+    matching_prompts = {task["prompt"] for task in matching_tasks}
+    stats = delete_task_runs(matching_prompts, dry_run=dry_run)
+
+    print()
+    print("Summary:")
+    print(f"  Files scanned: {stats['files_scanned']}")
+    print(f"  Files {'to modify' if dry_run else 'modified'}: {stats['files_modified']}")
+    print(f"  Tasks {'to delete' if dry_run else 'deleted'}: {stats['tasks_deleted']}")
+
+    if dry_run and stats["tasks_deleted"] > 0:
+        print()
+        print("Run with --force to apply changes.")
