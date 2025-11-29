@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 import llm
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
-from ai_palindromikisa.cli import parse_cli_arguments
 from ai_palindromikisa.formatting import format_price_for_console
 from ai_palindromikisa.logs import (
     get_completed_tasks,
@@ -17,11 +16,9 @@ from ai_palindromikisa.logs import (
 from ai_palindromikisa.models import (
     ModelConfig,
     ensure_model_metadata_exists,
-    find_or_create_model_config,
 )
 from ai_palindromikisa.pricing import get_request_cost
 from ai_palindromikisa.scores import show_scores
-from ai_palindromikisa.tasks import load_tasks
 
 
 def extract_palindrome(text):
@@ -210,32 +207,3 @@ def run_benchmark_for_config(
         print()
 
     show_scores(correct, total_tasks_run, completed_prompts, existing_logs)
-
-
-def main() -> None:
-    model_configs, limit = parse_cli_arguments()
-
-    # For configs from CLI (not ALL), find or create matching model files
-    resolved_configs = []
-    for config in model_configs:
-        resolved_config = find_or_create_model_config(config.name, config.options)
-        resolved_configs.append(resolved_config)
-
-    config_names = [
-        c.name + (f" {c.options}" if c.options else "") for c in resolved_configs
-    ]
-    print(f"Running benchmark for models: {', '.join(config_names)}\n")
-
-    system_prompt, tasks = load_tasks()
-
-    # Apply limit if specified
-    if limit is not None:
-        tasks = tasks[:limit]
-
-    # Run benchmark for each model configuration
-    for config in resolved_configs:
-        run_benchmark_for_config(config, system_prompt, tasks)
-
-
-if __name__ == "__main__":
-    main()

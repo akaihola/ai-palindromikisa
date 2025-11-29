@@ -206,22 +206,3 @@ def _process_log_file(
         log_file.write_text(string_stream.getvalue(), encoding="utf-8")
 
 
-def main() -> None:
-    """Main entry point for migration script."""
-    import argparse
-
-    parser = argparse.ArgumentParser(
-        description="Migrate model and log files to new option-based naming convention"
-    )
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Show what would be done without making changes",
-    )
-    args = parser.parse_args()
-
-    migrate_files(dry_run=args.dry_run)
-
-
-if __name__ == "__main__":
-    main()

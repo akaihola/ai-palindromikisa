@@ -227,12 +227,3 @@ def display_task_stats() -> None:
         legend_table.add_row(f"[{color}]{marker}[/{color}]", model)
 
     console.print(legend_table)
-
-
-def main() -> None:
-    """Main entry point for task statistics command."""
-    display_task_stats()
-
-
-if __name__ == "__main__":
-    main()

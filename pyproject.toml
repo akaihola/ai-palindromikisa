@@ -8,17 +8,19 @@ version = "0.1.0"
 description = "AI Palindrome Benchmark - evaluating LLM capability for creating palindromes"
 requires-python = ">=3.10"
 dependencies = [
-    "pyyaml",
+    "click",
+    "click-default-group>=1.2.3",
+    "livereload",
     "llm",
     "llm-anthropic",
     "llm-gemini",
     "llm-openrouter",
     "plotext",
+    "pyyaml",
+    "requests",
     "rich",
     "ruamel-yaml>=0.18.16",
-    "requests",
     "tenacity",
-    "livereload",
 ]
 
 [dependency-groups]
@@ -29,8 +31,7 @@ dev = [
 ]
 
 [project.scripts]
-benchmark = "ai_palindromikisa.benchmark:main"
-ai-palindromikisa = "ai_palindromikisa.__main__:main"
+ai-palindromikisa = "ai_palindromikisa.cli:cli"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

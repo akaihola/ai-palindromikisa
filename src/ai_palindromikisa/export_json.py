@@ -1,7 +1,5 @@
 """Export benchmark statistics as JSON for web visualization."""
 
-import json
-import sys
 from datetime import datetime, timezone
 
 from ai_palindromikisa.extract_models import extract_models_from_logs
@@ -223,14 +221,3 @@ def export_json() -> dict:
         },
         "chart_data": chart_data,
     }
-
-
-def main() -> None:
-    """Main entry point for export-json command."""
-    data = export_json()
-    json.dump(data, sys.stdout, indent=2, ensure_ascii=False)
-    print()  # Add trailing newline
-
-
-if __name__ == "__main__":
-    main()

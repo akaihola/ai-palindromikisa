@@ -1,12 +1,9 @@
 """Tests for CLI argument parsing."""
 
-import sys
-from unittest import mock
-
 import pytest
+from click.testing import CliRunner
 
-from ai_palindromikisa.cli import _parse_option_value, parse_cli_arguments
-from ai_palindromikisa.models import ModelConfig
+from ai_palindromikisa.cli import _parse_option_value, cli, option_callback
 
 
 class TestParseOptionValue:
@@ -46,90 +43,96 @@ class TestParseOptionValue:
         assert type(result) == type(expected)
 
 
-class TestParseCliArguments:
-    """Tests for parse_cli_arguments function."""
+class TestOptionCallback:
+    """Tests for option_callback function."""
 
-    def test_default_model(self):
-        """Test default model when no arguments provided."""
-        with mock.patch.object(sys, "argv", ["benchmark"]):
-            configs, limit = parse_cli_arguments()
-            assert len(configs) == 1
-            assert configs[0].name == "gemini/gemini-2.0-flash"
-            assert configs[0].options == {}
-            assert limit is None
-
-    def test_single_model(self):
-        """Test single model argument."""
-        with mock.patch.object(sys, "argv", ["benchmark", "-m", "test/model"]):
-            configs, limit = parse_cli_arguments()
-            assert len(configs) == 1
-            assert configs[0].name == "test/model"
-            assert configs[0].options == {}
-
-    def test_multiple_models(self):
-        """Test multiple model arguments."""
-        with mock.patch.object(
-            sys, "argv", ["benchmark", "-m", "model1", "-m", "model2"]
-        ):
-            configs, limit = parse_cli_arguments()
-            assert len(configs) == 2
-            assert configs[0].name == "model1"
-            assert configs[1].name == "model2"
+    def test_empty_options(self):
+        """Test callback with no options."""
+        result = option_callback(None, None, ())
+        assert result == {}
 
     def test_single_option(self):
-        """Test single -o option."""
-        with mock.patch.object(
-            sys, "argv", ["benchmark", "-m", "test/model", "-o", "temperature", "0.3"]
-        ):
-            configs, limit = parse_cli_arguments()
-            assert len(configs) == 1
-            assert configs[0].options == {"temperature": 0.3}
+        """Test callback with single option."""
+        result = option_callback(None, None, (("temperature", "0.3"),))
+        assert result == {"temperature": 0.3}
 
     def test_multiple_options(self):
-        """Test multiple -o options."""
-        with mock.patch.object(
-            sys,
-            "argv",
-            [
-                "benchmark",
-                "-m",
-                "test/model",
-                "-o",
-                "temperature",
-                "0.3",
-                "-o",
-                "max_tokens",
-                "100",
-            ],
-        ):
-            configs, limit = parse_cli_arguments()
-            assert configs[0].options == {"temperature": 0.3, "max_tokens": 100}
+        """Test callback with multiple options."""
+        result = option_callback(
+            None, None, (("temperature", "0.3"), ("max_tokens", "100"))
+        )
+        assert result == {"temperature": 0.3, "max_tokens": 100}
 
-    def test_limit_argument(self):
-        """Test --limit argument."""
-        with mock.patch.object(
-            sys, "argv", ["benchmark", "-m", "test/model", "-l", "5"]
-        ):
-            configs, limit = parse_cli_arguments()
-            assert limit == 5
 
-    def test_options_applied_to_all_models(self):
-        """Test that options are applied to all specified models."""
-        with mock.patch.object(
-            sys,
-            "argv",
-            [
-                "benchmark",
-                "-m",
-                "model1",
-                "-m",
-                "model2",
-                "-o",
-                "temperature",
-                "0.5",
-            ],
-        ):
-            configs, limit = parse_cli_arguments()
-            assert len(configs) == 2
-            assert configs[0].options == {"temperature": 0.5}
-            assert configs[1].options == {"temperature": 0.5}
+class TestCli:
+    """Tests for CLI commands."""
+
+    def test_help(self):
+        """Test main help output."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["--help"])
+        assert result.exit_code == 0
+        assert "AI-Palindromikisa" in result.output
+        assert "benchmark" in result.output
+        assert "stats" in result.output
+        assert "tasks" in result.output
+
+    def test_version(self):
+        """Test version output."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["--version"])
+        assert result.exit_code == 0
+
+    def test_benchmark_help(self):
+        """Test benchmark command help."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["benchmark", "--help"])
+        assert result.exit_code == 0
+        assert "--model" in result.output
+        assert "--option" in result.output
+        assert "--limit" in result.output
+
+    def test_stats_help(self):
+        """Test stats command help."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["stats", "--help"])
+        assert result.exit_code == 0
+        assert "Extract and display statistics" in result.output
+
+    def test_tasks_help(self):
+        """Test tasks command help."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["tasks", "--help"])
+        assert result.exit_code == 0
+        assert "task-level statistics" in result.output
+
+    def test_serve_help(self):
+        """Test serve command help."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["serve", "--help"])
+        assert result.exit_code == 0
+        assert "--port" in result.output
+        assert "--build-only" in result.output
+        assert "--output" in result.output
+
+    def test_migrate_help(self):
+        """Test migrate command help."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["migrate", "--help"])
+        assert result.exit_code == 0
+        assert "--dry-run" in result.output
+
+    def test_delete_task_help(self):
+        """Test delete-task command help."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["delete-task", "--help"])
+        assert result.exit_code == 0
+        assert "--search" in result.output
+        assert "--force" in result.output
+
+    def test_delete_task_requires_search(self):
+        """Test delete-task requires --search option."""
+        runner = CliRunner()
+        result = runner.invoke(cli, ["delete-task"])
+        assert result.exit_code != 0
+        assert "Missing option" in result.output or "required" in result.output.lower()
