@@ -1,0 +1,43 @@
+date: '2025-11-28'
+model: models/gemini-gemini-2.0-flash.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  {prompt}
+  VASTAUS:
+tasks:
+  - timestamp: '2025-11-28T05:40:25Z'
+    prompt: 'Täytä keskelle yksi sana: Otti haju ______. Ei enää nenuja, hitto!'
+    answer: otti haju jaha itto. ei enää nenuja, hitto!
+    is_correct: false
+    duration_seconds: 0.54
+    metadata:
+      input_tokens: 207
+      output_tokens: 30
+      cost_usd: 0.00004905
+      cost_source: litellm
+  - timestamp: '2025-11-28T05:40:26Z'
+    prompt: >-
+      Tee 'emo'-sanasta yhdyssanan jälkipuolisko.
+      Se on oltava jotain tiettyä eläinlajia edustava emo.
+      Muokattava palindromi: Nosta komeana emo! Katson.
+    answer: nosta komeana emomena! katson.
+    is_correct: false
+    duration_seconds: 0.58
+    metadata:
+      input_tokens: 236
+      output_tokens: 22
+      cost_usd: 0.0000486
+      cost_source: litellm

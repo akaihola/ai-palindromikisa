@@ -1,0 +1,3 @@
+name: openrouter/google/gemini-3-pro-preview
+options:
+  temperature: 0.5

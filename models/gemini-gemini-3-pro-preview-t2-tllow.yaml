@@ -1,0 +1,4 @@
+name: gemini/gemini-3-pro-preview
+options:
+  temperature: 2.0
+  thinking_level: low

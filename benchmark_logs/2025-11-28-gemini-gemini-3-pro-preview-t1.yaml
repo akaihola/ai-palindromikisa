@@ -1,0 +1,212 @@
+date: '2025-11-28'
+model: models/gemini-gemini-3-pro-preview-t1.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  {prompt}
+  VASTAUS:
+tasks:
+  - timestamp: '2025-11-28T20:25:45Z'
+    prompt: Suomalainen kaksikirjaiminen paikannimi
+    answer: ii
+    is_correct: true
+    duration_seconds: 6.09
+    metadata:
+      input_tokens: 201
+      output_tokens: 447
+      cost_usd: 0.005766
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:25:51Z'
+    prompt: Kolmekirjaiminen sana, käytä vain kirjaimia T ja U
+    answer: utu
+    is_correct: true
+    duration_seconds: 7.07
+    metadata:
+      input_tokens: 207
+      output_tokens: 556
+      cost_usd: 0.007086
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:25:58Z'
+    prompt: Nelikirjaiminen sana, käytä vain kirjaimia Y ja S
+    answer: syys
+    is_correct: true
+    duration_seconds: 7.88
+    metadata:
+      input_tokens: 206
+      output_tokens: 496
+      cost_usd: 0.006364
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:26:06Z'
+    prompt: Viisikirjaiminen sana, kuvaa henkilöä joka ajaa
+    answer: ajaja
+    is_correct: true
+    duration_seconds: 6.34
+    metadata:
+      input_tokens: 206
+      output_tokens: 540
+      cost_usd: 0.006892
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:26:12Z'
+    prompt: Järjestyslukusana kirjaimin kirjoitettuna
+    answer: sadas
+    is_correct: true
+    duration_seconds: 9.97
+    metadata:
+      input_tokens: 203
+      output_tokens: 853
+      cost_usd: 0.010642
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:26:22Z'
+    prompt: >-
+      Kaksi sanaa, joilla Sakarin mielitietty ilmaisee Sakarin olevan hänelle rakas
+    answer: '"sakari, rakas."'
+    is_correct: true
+    duration_seconds: 37.13
+    metadata:
+      input_tokens: 213
+      output_tokens: 3250
+      cost_usd: 0.039426
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:27:00Z'
+    prompt: Lause sanoista "pyhä", "iso", "hypnoosi" ja "on"
+    answer: iso on pyhä hypnoosi.
+    is_correct: true
+    duration_seconds: 7.24
+    metadata:
+      input_tokens: 210
+      output_tokens: 585
+      cost_usd: 0.00744
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:27:07Z'
+    prompt: 'Täydennä puuttuva kirjain: Assi _okaa kodissa.'
+    answer: assi dokaa kodissa.
+    is_correct: true
+    duration_seconds: 11.34
+    metadata:
+      input_tokens: 209
+      output_tokens: 1094
+      cost_usd: 0.013546
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:27:18Z'
+    prompt: 'Täydennä puuttuvat kirjaimet: Sanni kat___, isä, siis ota ______!'
+    answer: sanni katosi, isä, siis ota kinnas!
+    is_correct: true
+    duration_seconds: 37.99
+    metadata:
+      input_tokens: 215
+      output_tokens: 3670
+      cost_usd: 0.04447
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:27:56Z'
+    prompt: Lause, jossa sekä tavit että sudet edustivat
+    answer: tavit, sudet edustivat.
+    is_correct: true
+    duration_seconds: 33.95
+    metadata:
+      input_tokens: 203
+      output_tokens: 3393
+      cost_usd: 0.041122
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:28:30Z'
+    prompt: 'Täydennä loppuosa: Isoja hajuja _ _ _ _ _ _.'
+    answer: isoja hajuja ajuja hajosi.
+    is_correct: false
+    duration_seconds: 24.57
+    metadata:
+      input_tokens: 210
+      output_tokens: 2101
+      cost_usd: 0.025632
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:28:55Z'
+    prompt: >-
+      Tämä kaksisanainen lause väittää ilman verbiä, että laiskoja ihmisiä hakeutuisi
+      taksialalle töihin.
+    answer: laiskat taksial.
+    is_correct: false
+    duration_seconds: 17.72
+    metadata:
+      input_tokens: 222
+      output_tokens: 1739
+      cost_usd: 0.021312
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:29:13Z'
+    prompt: >-
+      Täydennä alku ja loppu lyhyesti.
+      Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
+      Täydennettävä palindromin keskiosa:
+      Uolevi. Otitte, imaisit. Uutisia mietti toivelounaalla
+    answer: imaami ada lallaan, uolevi. otitte, imaisit. uutisia mietti toivelounaalla lada, imaami.
+    is_correct: false
+    duration_seconds: 152.05
+    metadata:
+      input_tokens: 256
+      output_tokens: 13461
+      cost_usd: 0.162044
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:31:45Z'
+    prompt: 'Täytä keskelle yksi sana: Niskasta _______, tukat saksin.'
+    answer: niskasta kut, tukat saksin.
+    is_correct: false
+    duration_seconds: 92.66
+    metadata:
+      input_tokens: 209
+      output_tokens: 7889
+      cost_usd: 0.095086
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:33:17Z'
+    prompt: 'Täydennä alkuun yksi lyhyt sana: __ sivele tällä televisio!'
+    answer: oi sivele tällä televisio!
+    is_correct: true
+    duration_seconds: 20.11
+    metadata:
+      input_tokens: 211
+      output_tokens: 2029
+      cost_usd: 0.02477
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:33:38Z'
+    prompt: >-
+      Poista yksi sana niin että jäljelle jää edelleen palindromi:
+      Oi, sivele tällä televisio!
+    answer: oi, sivele televisio!
+    is_correct: true
+    duration_seconds: 9.05
+    metadata:
+      input_tokens: 215
+      output_tokens: 989
+      cost_usd: 0.012298
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:33:47Z'
+    prompt: 'Täytä keskelle yksi sana: Otti haju ______. Ei enää nenuja, hitto!'
+    answer: otti haju nenään. ei enää nenuja, hitto!
+    is_correct: true
+    duration_seconds: 33.32
+    metadata:
+      input_tokens: 215
+      output_tokens: 3070
+      cost_usd: 0.03727
+      cost_source: litellm
+  - timestamp: '2025-11-28T20:34:20Z'
+    prompt: >-
+      Tee 'emo'-sanasta yhdyssanan jälkipuolisko.
+      Se on oltava jotain tiettyä eläinlajia edustava emo.
+      Muokattava palindromi: Nosta komeana emo! Katson.
+    answer: nosta komeammat, tammaemo! katson.
+    is_correct: false
+    duration_seconds: 101.21
+    metadata:
+      input_tokens: 243
+      output_tokens: 10791
+      cost_usd: 0.129978
+      cost_source: litellm

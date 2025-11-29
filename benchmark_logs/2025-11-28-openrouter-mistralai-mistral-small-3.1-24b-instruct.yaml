@@ -1,0 +1,43 @@
+date: '2025-11-28'
+model: models/openrouter-mistralai-mistral-small-3.1-24b-instruct.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  {prompt}
+  VASTAUS:
+tasks:
+  - timestamp: '2025-11-28T17:17:18Z'
+    prompt: 'Täytä keskelle yksi sana: Otti haju ______. Ei enää nenuja, hitto!'
+    answer: otti haju **kukka**. ei enää nenuja, hitto!
+    is_correct: false
+    duration_seconds: 0.8
+    metadata:
+      input_tokens: 218
+      output_tokens: 33
+      cost_usd: 0.0000317
+      cost_source: openrouter
+  - timestamp: '2025-11-28T17:17:19Z'
+    prompt: >-
+      Tee 'emo'-sanasta yhdyssanan jälkipuolisko.
+      Se on oltava jotain tiettyä eläinlajia edustava emo.
+      Muokattava palindromi: Nosta komeana emo! Katson.
+    answer: nosta komeana emokarhu! katson.
+    is_correct: false
+    duration_seconds: 0.7
+    metadata:
+      input_tokens: 247
+      output_tokens: 27
+      cost_usd: 0.0000328
+      cost_source: openrouter

@@ -1,0 +1,43 @@
+date: '2025-11-28'
+model: models/anthropic-claude-sonnet-4-5.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  {prompt}
+  VASTAUS:
+tasks:
+  - timestamp: '2025-11-28T05:40:19Z'
+    prompt: 'Täytä keskelle yksi sana: Otti haju ______. Ei enää nenuja, hitto!'
+    answer: otti haju jahattieh. ei enää nenuja, hitto!
+    is_correct: false
+    duration_seconds: 3.07
+    metadata:
+      input_tokens: 263
+      output_tokens: 34
+      cost_usd: 0.001299
+      cost_source: litellm
+  - timestamp: '2025-11-28T05:40:22Z'
+    prompt: >-
+      Tee 'emo'-sanasta yhdyssanan jälkipuolisko.
+      Se on oltava jotain tiettyä eläinlajia edustava emo.
+      Muokattava palindromi: Nosta komeana emo! Katson.
+    answer: nosta koiranaemo! katson.
+    is_correct: false
+    duration_seconds: 3.0
+    metadata:
+      input_tokens: 300
+      output_tokens: 26
+      cost_usd: 0.00129
+      cost_source: litellm

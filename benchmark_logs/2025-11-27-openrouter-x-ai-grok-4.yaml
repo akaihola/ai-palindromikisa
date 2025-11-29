@@ -1,0 +1,30 @@
+date: '2025-11-27'
+model: models/openrouter-x-ai-grok-4.yaml
+prompt_template: |-
+  Olet erinomainen palindromien kirjoittaja.
+  Luo tai täydennä pyydetynlainen palindromi.
+  Sisällytä vastaukseen aina koko palindromi, myös täydentämistehtävissä.
+  Ympäröi luomasi palindromi XML-tageilla <PALINDROMI> ja </PALINDROMI>.
+
+  Esimerkki:
+  TEHTÄVÄ:
+  Luo seuraavanlainen palindromi:
+  Antti saa Totilta toteamuksen, että otti naiset, leikkisästi Elli-nimiset sellaiset.
+  VASTAUS:
+  <PALINDROMI>"Ellit, naiset otit", Totti totesi Antille.</PALINDROMI>
+
+  TEHTÄVÄ
+  Luo seuraavanlainen palindromi:
+  {prompt}
+  VASTAUS:
+tasks:
+  - timestamp: '2025-11-27T21:33:31Z'
+    prompt: >-
+      Täydennä alku ja loppu lyhyesti.
+      Yritä saada mukaan uskonnollinen johtaja, nainen ja venäläinen auto.
+      Täydennettävä palindromin keskiosa:
+      Uolevi. Otitte, imaisit. Uutisia mietti toivelounaalla
+    answer: ''
+    is_correct: false
+    duration_seconds: 1088.31
+    metadata: {}
