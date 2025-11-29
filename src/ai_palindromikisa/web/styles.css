@@ -196,10 +196,6 @@ td:nth-child(5) {
   min-width: 0;
 }
 
-.chart-wrapper:last-child {
-  grid-column: 1 / 2;
-}
-
 .chart-wrapper h3 {
   margin-bottom: 1rem;
 }
@@ -287,10 +283,6 @@ footer a:hover {
 @media (max-width: 1024px) {
   .charts-container {
     grid-template-columns: 1fr;
-  }
-
-  .chart-wrapper:last-child {
-    grid-column: auto;
   }
 }
 

@@ -87,6 +87,7 @@ function renderCharts() {
   // Convert cost from dollars to cents for charts
   const successVsCostCents = data.chart_data.success_vs_cost.map(p => ({ ...p, x: p.x * 100 }));
   const timeVsCostCents = data.chart_data.time_vs_cost_top5.map(p => ({ ...p, x: p.x * 100 }));
+  const successVsCostPerSuccessCents = data.chart_data.success_vs_cost_per_success.map(p => ({ ...p, x: p.x * 100 }));
 
   // Success vs Cost: best = low cost (x: 0 to median), high success (y: median to 100)
   renderScatterChart('chart-success-cost', successVsCostCents, '\u00a2/Task', 'Success %', {
@@ -95,6 +96,15 @@ function renderCharts() {
     yMinFn: (yMedian) => yMedian,
     yMax: 100,
     tooltipFn: p => `${p.marker} ${p.name}: ${p.y.toFixed(1)}%, ${p.x.toFixed(2)}\u00a2`
+  });
+
+  // Success vs Cost per Success: best = low cost per success (x: 0 to median), high success (y: median to 100)
+  renderScatterChart('chart-success-cost-per-success', successVsCostPerSuccessCents, '\u00a2/Success', 'Success %', {
+    xMin: 0,
+    xMaxFn: (xMedian) => xMedian,
+    yMinFn: (yMedian) => yMedian,
+    yMax: 100,
+    tooltipFn: p => `${p.marker} ${p.name}: ${p.y.toFixed(1)}%, ${p.x.toFixed(2)}\u00a2/success`
   });
 
   // Success vs Time: best = low time (x: 0 to median), high success (y: median to 100)

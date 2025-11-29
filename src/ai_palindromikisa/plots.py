@@ -142,10 +142,11 @@ def _get_plot_size() -> tuple[int, int]:
 
 def _compute_model_metrics(
     models: dict[str, dict],
-) -> list[tuple[str, float, float, float]]:
+) -> list[tuple[str, float, float, float, float | None]]:
     """Compute metrics for each model.
 
-    Returns list of (name, success_pct, cost_per_task, time_per_task) tuples.
+    Returns list of (name, success_pct, cost_per_task, time_per_task, cost_per_success) tuples.
+    cost_per_success is None for models with 0% success rate.
     """
     metrics = []
     for name, stats in models.items():
@@ -154,7 +155,14 @@ def _compute_model_metrics(
         success_pct = (stats["correct_tasks"] / stats["task_count"]) * 100
         cost_per_task = stats["total_cost"] / stats["task_count"]
         time_per_task = stats["total_duration"] / stats["task_count"]
-        metrics.append((name, success_pct, cost_per_task, time_per_task))
+        cost_per_success = (
+            stats["total_cost"] / stats["correct_tasks"]
+            if stats["correct_tasks"] > 0
+            else None
+        )
+        metrics.append(
+            (name, success_pct, cost_per_task, time_per_task, cost_per_success)
+        )
     return metrics
 
 
@@ -191,7 +199,7 @@ def _assign_colors(
 
 
 def _print_legend(
-    metrics: list[tuple[str, float, float, float]],
+    metrics: list[tuple],
     marker_map: dict[str, str],
     color_map: dict[str, tuple[str, str]],
     title: str,
@@ -201,7 +209,8 @@ def _print_legend(
     table = Table(title=title, show_edge=False)
     table.add_column("#", justify="right")
     table.add_column("Model", justify="left")
-    for name, _, _, _ in metrics:
+    for metric in metrics:
+        name = metric[0]
         marker = marker_map[name]
         _, rich_color = color_map[name]
         table.add_row(f"[{rich_color}]{marker}[/{rich_color}]", name)
@@ -218,7 +227,7 @@ def _setup_plot() -> None:
 
 
 def plot_success_vs_cost(
-    metrics: list[tuple[str, float, float, float]],
+    metrics: list[tuple[str, float, float, float, float | None]],
     marker_map: dict[str, str],
     color_map: dict[str, tuple[str, str]],
 ) -> None:
@@ -231,7 +240,7 @@ def plot_success_vs_cost(
     successes = [m[1] for m in metrics]
 
     # Plot each point with its marker (convert cost to cents)
-    for i, (name, _, cost, _) in enumerate(metrics):
+    for i, (name, _, cost, _, _) in enumerate(metrics):
         y = successes[i]
         x = cost * 100  # Convert to cents
         marker = marker_map[name]
@@ -243,7 +252,7 @@ def plot_success_vs_cost(
 
 
 def plot_success_vs_time(
-    metrics: list[tuple[str, float, float, float]],
+    metrics: list[tuple[str, float, float, float, float | None]],
     marker_map: dict[str, str],
     color_map: dict[str, tuple[str, str]],
 ) -> None:
@@ -255,7 +264,7 @@ def plot_success_vs_time(
 
     successes = [m[1] for m in metrics]
 
-    for i, (name, _, _, x) in enumerate(metrics):
+    for i, (name, _, _, x, _) in enumerate(metrics):
         y = successes[i]
         marker = marker_map[name]
         plotext_color, _ = color_map[name]
@@ -266,7 +275,7 @@ def plot_success_vs_time(
 
 
 def plot_time_vs_cost_top5(
-    metrics: list[tuple[str, float, float, float]],
+    metrics: list[tuple[str, float, float, float, float | None]],
     marker_map: dict[str, str],
     color_map: dict[str, tuple[str, str]],
 ) -> None:
@@ -279,7 +288,7 @@ def plot_time_vs_cost_top5(
     plt.xlabel("¢/Task")
     plt.ylabel("Time/Task (s)")
 
-    for name, _, cost, time in sorted_metrics:
+    for name, _, cost, time, _ in sorted_metrics:
         marker = marker_map[name]
         plotext_color, _ = color_map[name]
         plt.scatter([cost * 100], [time], marker=marker, color=plotext_color)
@@ -288,14 +297,47 @@ def plot_time_vs_cost_top5(
     _print_legend(sorted_metrics, marker_map, color_map, "Legend (top 5)")
 
 
+def plot_success_vs_cost_per_success(
+    metrics: list[tuple[str, float, float, float, float | None]],
+    marker_map: dict[str, str],
+    color_map: dict[str, tuple[str, str]],
+) -> None:
+    """Plot Success % vs ¢/Success for models with at least one success."""
+    # Filter to only models with successful tasks
+    successful_metrics = [(m[0], m[1], m[4]) for m in metrics if m[4] is not None]
+
+    if not successful_metrics:
+        print("No models with successful tasks to plot.")
+        return
+
+    _setup_plot()
+    plt.title("Success % vs ¢/Success (all models)")
+    plt.xlabel("¢/Success")
+    plt.ylabel("Success %")
+
+    for name, success_pct, cost_per_success in successful_metrics:
+        x = cost_per_success * 100  # Convert to cents
+        y = success_pct
+        marker = marker_map[name]
+        plotext_color, _ = color_map[name]
+        plt.scatter([x], [y], marker=marker, color=plotext_color)
+
+    plt.show()
+    # Create filtered metrics list for legend (preserving tuple structure)
+    filtered_for_legend = [m for m in metrics if m[4] is not None]
+    _print_legend(filtered_for_legend, marker_map, color_map, "Legend")
+
+
 def show_all_plots(models: dict[str, dict]) -> None:
-    """Display all three scatterplots."""
+    """Display all four scatterplots."""
     metrics = _compute_model_metrics(models)
     model_names = [m[0] for m in metrics]
     marker_map = _assign_markers(model_names)
     color_map = _assign_colors(model_names)
 
     plot_success_vs_cost(metrics, marker_map, color_map)
+    print()
+    plot_success_vs_cost_per_success(metrics, marker_map, color_map)
     print()
     plot_success_vs_time(metrics, marker_map, color_map)
     print()

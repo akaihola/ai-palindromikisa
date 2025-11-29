@@ -112,6 +112,13 @@ def export_json() -> dict:
         time_per_task = stats["total_duration"] / stats["task_count"]
         sorted_dates = sorted(stats["dates"])
 
+        # Cost per success: total_cost / correct_tasks (None if no successes)
+        cost_per_success = (
+            stats["total_cost"] / stats["correct_tasks"]
+            if stats["correct_tasks"] > 0
+            else None
+        )
+
         models_list.append(
             {
                 "name": model_name,
@@ -119,6 +126,7 @@ def export_json() -> dict:
                 "correct": stats["correct_tasks"],
                 "total": stats["task_count"],
                 "cost_per_task": cost_per_task,
+                "cost_per_success": cost_per_success,
                 "time_per_task": time_per_task,
                 "first_date": sorted_dates[0] if sorted_dates else None,
                 "last_date": sorted_dates[-1] if sorted_dates else None,
@@ -190,6 +198,17 @@ def export_json() -> dict:
                 "color": m["color"],
             }
             for m in top5
+        ],
+        "success_vs_cost_per_success": [
+            {
+                "name": m["name"],
+                "x": m["cost_per_success"],
+                "y": m["accuracy"] * 100,
+                "marker": m["marker"],
+                "color": m["color"],
+            }
+            for m in models_list
+            if m["cost_per_success"] is not None  # Exclude models with 0% success
         ],
     }
 
