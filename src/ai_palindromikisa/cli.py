@@ -53,17 +53,6 @@ def cli() -> None:
     """AI-Palindromikisa - Benchmark LLMs on Finnish palindrome generation.
 
     Documentation: https://github.com/akaihola/ai-palindromikisa
-
-    \b
-    Commands:
-      benchmark       Run palindrome benchmark tasks (default)
-      stats           Extract and display statistics from benchmark logs
-      tasks           Display task-level statistics across all models
-      export-json     Export statistics as JSON for web visualization
-      serve           Build and serve web interface locally
-      update-pricing  Update pricing cache from LiteLLM repository
-      migrate         Migrate files to new option-based naming convention
-      delete-task     Delete task runs matching a search term
     """
 
 
