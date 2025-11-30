@@ -132,6 +132,7 @@ def export_json() -> dict:
                 "last_date": sorted_dates[-1] if sorted_dates else None,
                 "marker": marker_map.get(model_name, "?"),
                 "color": color_map.get(model_name, "#888888"),
+                "skip": stats.get("skip", False),
             }
         )
 

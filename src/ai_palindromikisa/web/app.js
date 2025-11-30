@@ -2,12 +2,33 @@
 
 const tooltip = document.getElementById('tooltip');
 let data = null;
+let showSkipped = false;
+const charts = {}; // Track Chart instances by canvas ID
 
 // Fetch and render data
 fetch('data.json')
   .then(r => r.json())
-  .then(d => { data = d; render(); })
+  .then(d => { data = d; setupCheckbox(); render(); })
   .catch(e => console.error('Failed to load data:', e));
+
+function setupCheckbox() {
+  const checkbox = document.getElementById('show-skipped-checkbox');
+  checkbox.addEventListener('change', (e) => {
+    showSkipped = e.target.checked;
+    render();
+  });
+}
+
+function getVisibleModels() {
+  return data.models.filter(m => !m.skip || showSkipped);
+}
+
+function getVisibleSortedModelNames() {
+  return data.sorted_model_names.filter(name => {
+    const model = data.models.find(m => m.name === name);
+    return model && (!model.skip || showSkipped);
+  });
+}
 
 function render() {
   renderGeneratedAt();
@@ -25,7 +46,8 @@ function renderGeneratedAt() {
 
 function renderModelsTable() {
   const tbody = document.querySelector('#models-table tbody');
-  tbody.innerHTML = data.models.map((m, i) => `
+  const visibleModels = getVisibleModels();
+  tbody.innerHTML = visibleModels.map((m, i) => `
     <tr>
       <td>${i + 1}</td>
       <td>${(m.accuracy * 100).toFixed(1)}%</td>
@@ -46,12 +68,13 @@ function renderTotals() {
 
 function renderTasksTable() {
   const tbody = document.querySelector('#tasks-table tbody');
+  const visibleModelNames = getVisibleSortedModelNames();
   tbody.innerHTML = data.tasks.map(t => `
     <tr>
       <td>${(t.success_rate * 100).toFixed(0)}%</td>
       <td>${t.avg_time.toFixed(1)}s</td>
       <td>${(t.avg_cost * 100).toFixed(2)}\u00a2</td>
-      <td class="model-markers">${buildMarkers(t.model_results)}</td>
+      <td class="model-markers">${buildMarkers(t.model_results, visibleModelNames)}</td>
       <td class="answer-text" data-tooltip="${t.reference.replaceAll('"', '&quot;')}">${t.reference}</td>
       <td class="prompt-text" data-tooltip="${t.prompt.replaceAll('"', '&quot;')}">${t.prompt}</td>
     </tr>
@@ -60,8 +83,8 @@ function renderTasksTable() {
   attachTooltips();
 }
 
-function buildMarkers(results) {
-  return data.sorted_model_names.map(name => {
+function buildMarkers(results, visibleModelNames) {
+  return visibleModelNames.map(name => {
     const model = data.models.find(m => m.name === name) ?? { marker: '?', color: '#888' };
     const success = results[name];
     if (success === true) {
@@ -74,7 +97,8 @@ function buildMarkers(results) {
 }
 
 function renderLegend() {
-  document.getElementById('legend-items').innerHTML = data.sorted_model_names.map(name => {
+  const visibleModelNames = getVisibleSortedModelNames();
+  document.getElementById('legend-items').innerHTML = visibleModelNames.map(name => {
     const model = data.models.find(m => m.name === name) ?? { marker: '?', color: '#888' };
     return `<div class="legend-item">
       <span class="legend-marker" style="color:${model.color}">${model.marker}</span>
@@ -84,10 +108,20 @@ function renderLegend() {
 }
 
 function renderCharts() {
-  // Convert cost from dollars to cents for charts
-  const successVsCostCents = data.chart_data.success_vs_cost.map(p => ({ ...p, x: p.x * 100 }));
-  const timeVsCostCents = data.chart_data.time_vs_cost_top5.map(p => ({ ...p, x: p.x * 100 }));
-  const successVsCostPerSuccessCents = data.chart_data.success_vs_cost_per_success.map(p => ({ ...p, x: p.x * 100 }));
+  const visibleModels = getVisibleModels();
+
+  // Filter chart data to only include visible models
+  const successVsCostCents = data.chart_data.success_vs_cost
+    .filter(p => visibleModels.some(m => m.name === p.name))
+    .map(p => ({ ...p, x: p.x * 100 }));
+  const timeVsCostCents = data.chart_data.time_vs_cost_top5
+    .filter(p => visibleModels.some(m => m.name === p.name))
+    .map(p => ({ ...p, x: p.x * 100 }));
+  const successVsCostPerSuccessCents = data.chart_data.success_vs_cost_per_success
+    .filter(p => visibleModels.some(m => m.name === p.name))
+    .map(p => ({ ...p, x: p.x * 100 }));
+  const successVsTime = data.chart_data.success_vs_time
+    .filter(p => visibleModels.some(m => m.name === p.name));
 
   // Success vs Cost: best = low cost (x: 0 to median), high success (y: median to 100)
   renderScatterChart('chart-success-cost', successVsCostCents, '\u00a2/Task', 'Success %', {
@@ -108,7 +142,7 @@ function renderCharts() {
   });
 
   // Success vs Time: best = low time (x: 0 to median), high success (y: median to 100)
-  renderScatterChart('chart-success-time', data.chart_data.success_vs_time, 'Time/Task (s)', 'Success %', {
+  renderScatterChart('chart-success-time', successVsTime, 'Time/Task (s)', 'Success %', {
     xMin: 0,
     xMaxFn: (xMedian) => xMedian,
     yMinFn: (yMedian) => yMedian,
@@ -127,6 +161,11 @@ function renderCharts() {
 }
 
 function renderScatterChart(canvasId, points, xLabel, yLabel, quadrant) {
+  // Destroy existing chart if it exists
+  if (charts[canvasId]) {
+    charts[canvasId].destroy();
+  }
+
   const ctx = document.getElementById(canvasId).getContext('2d');
 
   const xValues = points.map(p => p.x);
@@ -141,7 +180,7 @@ function renderScatterChart(canvasId, points, xLabel, yLabel, quadrant) {
   const boxYMin = quadrant.yMinFn?.(yMedian) ?? quadrant.yMin ?? 0;
   const boxYMax = quadrant.yMaxFn?.(yMedian) ?? quadrant.yMax ?? yMax;
 
-  new Chart(ctx, {
+  charts[canvasId] = new Chart(ctx, {
     type: 'scatter',
     data: {
       datasets: points.map(p => ({

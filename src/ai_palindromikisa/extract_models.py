@@ -13,7 +13,7 @@ import yaml
 from rich.console import Console
 from rich.table import Table
 
-from ai_palindromikisa.models import get_display_name_from_path
+from ai_palindromikisa.models import get_display_name_from_path, load_model_config_from_path
 from ai_palindromikisa.paths import BENCHMARK_LOGS_DIR
 from ai_palindromikisa.plots import show_all_plots
 
@@ -50,6 +50,7 @@ def extract_models_from_logs() -> dict:
             "total_cost": 0.0,
             "dates": set(),
             "filenames": [],
+            "skip": False,
         }
     )
     total_cost = 0.0
@@ -70,6 +71,10 @@ def extract_models_from_logs() -> dict:
             model_name = _extract_model_name(cast("str", model_path))
             date = data.get("date", "Unknown")
 
+            # Load model config to get skip status
+            model_config = load_model_config_from_path(cast("str", model_path))
+            skip = model_config.skip if model_config else False
+
             # Calculate costs from task metadata
             file_cost = sum(
                 task.get("metadata", {}).get("cost_usd", 0) or 0 for task in tasks
@@ -86,6 +91,7 @@ def extract_models_from_logs() -> dict:
             models[model_name]["total_cost"] += file_cost
             models[model_name]["dates"].add(date)
             models[model_name]["filenames"].append(yaml_file.name)
+            models[model_name]["skip"] = skip
 
             total_cost += file_cost
 
