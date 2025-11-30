@@ -68,3 +68,11 @@ tasks:
       Se on oltava jotain tiettyä eläinlajia edustava emo.
       Muokattava palindromi: Nosta komeana emo! Katson.
     reference: "Nosta komeana kanaemo! Katson."
+  - prompt: >-
+      Taivuta ja järjestä nämä neljä sanaa palindromiksi:
+      maa maksu rassata tuska
+    reference: "Tuska maassa, rassaa maksut."
+  - prompt: >-
+      Täydennä alku ja loppu palindromiksi:
+      _ _  _ _ _ _ _? Esa rapsauttaa taattua parase_ _ _ _ _ _ _.
+    reference: "Ai lomat? Esa rapsauttaa taattua parasetamolia."
