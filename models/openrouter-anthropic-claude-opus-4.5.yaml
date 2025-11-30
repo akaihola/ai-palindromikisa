@@ -1,1 +1,2 @@
 name: openrouter/anthropic/claude-opus-4.5
+skip: true
