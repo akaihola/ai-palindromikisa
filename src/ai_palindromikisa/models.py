@@ -14,6 +14,7 @@ class ModelConfig:
 
     name: str
     options: dict[str, str | float | int | bool] = field(default_factory=dict)
+    skip: bool = False
 
     def get_display_name(self) -> str:
         """Get the display name in llm library format with verbose options.
@@ -47,8 +48,16 @@ class ModelConfig:
         return MODELS_DIR / f"{self.get_base_filename()}.yaml"
 
 
-def get_all_model_configs() -> list[ModelConfig]:
-    """Extract model configurations from model files in the models directory."""
+def get_all_model_configs(include_skipped: bool = False) -> list[ModelConfig]:
+    """Extract model configurations from model files in the models directory.
+
+    Args:
+        include_skipped: If False (default), exclude models with skip=true.
+                        If True, include all models regardless of skip status.
+
+    Returns:
+        List of ModelConfig objects.
+    """
     if not MODELS_DIR.exists():
         print(f"Warning: Models directory '{MODELS_DIR}' not found.")
         print("Please create the models directory and add model configuration files.")
@@ -68,14 +77,26 @@ def get_all_model_configs() -> list[ModelConfig]:
             model_name = model_data.get("name", "")
             if model_name:
                 options = model_data.get("options", {}) or {}
+                skip = model_data.get("skip", False)
+
+                # Skip models with skip=true unless include_skipped is True
+                if skip and not include_skipped:
+                    options_str = f" (options: {options})" if options else ""
+                    print(
+                        f"Skipping model: {model_name}{options_str} (from {model_file.name})"
+                    )
+                    continue
+
                 config = ModelConfig(
                     name=model_name,
                     options=options,
+                    skip=skip,
                 )
                 configs.append(config)
                 options_str = f" (options: {options})" if options else ""
+                skip_str = " [SKIPPED]" if skip else ""
                 print(
-                    f"Found model: {model_name}{options_str} (from {model_file.name})"
+                    f"Found model: {model_name}{options_str}{skip_str} (from {model_file.name})"
                 )
             else:
                 print(f"Warning: No 'name' field found in {model_file.name}")
@@ -224,7 +245,8 @@ def load_model_config_from_path(model_path: str) -> ModelConfig | None:
         if not model_name:
             return None
         options = model_data.get("options", {}) or {}
-        return ModelConfig(name=model_name, options=options)
+        skip = model_data.get("skip", False)
+        return ModelConfig(name=model_name, options=options, skip=skip)
     except Exception:
         return None
 

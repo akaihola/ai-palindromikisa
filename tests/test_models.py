@@ -119,6 +119,29 @@ class TestModelConfig:
         config = ModelConfig(name=name, options=options)
         assert config.get_base_filename() == expected
 
+    def test_default_skip_value(self):
+        """Test ModelConfig skip field defaults to False."""
+        config = ModelConfig(name="test/model")
+        assert config.skip is False
+
+    def test_skip_can_be_set_to_true(self):
+        """Test ModelConfig skip field can be set to True."""
+        config = ModelConfig(name="test/model", skip=True)
+        assert config.skip is True
+
+    def test_skip_can_be_explicitly_set_to_false(self):
+        """Test ModelConfig skip field can be explicitly set to False."""
+        config = ModelConfig(name="test/model", skip=False)
+        assert config.skip is False
+
+    def test_skip_with_options(self):
+        """Test ModelConfig skip field works with options."""
+        config = ModelConfig(
+            name="test/model", options={"temperature": 0.5}, skip=True
+        )
+        assert config.skip is True
+        assert config.options == {"temperature": 0.5}
+
 
 class TestOptionsMatch:
     """Tests for _options_match function."""
@@ -174,6 +197,85 @@ class TestGetAllModelConfigs:
         """Test with empty models directory."""
         configs = get_all_model_configs()
         assert configs == []
+
+    def test_skips_models_with_skip_true_by_default(self, mock_models_dir):
+        """Test that models with skip=true are excluded by default."""
+        (mock_models_dir / "model-included.yaml").write_text("name: test/included\n")
+        (mock_models_dir / "model-skipped.yaml").write_text(
+            "name: test/skipped\nskip: true\n"
+        )
+
+        configs = get_all_model_configs()
+
+        assert len(configs) == 1
+        assert configs[0].name == "test/included"
+        assert configs[0].skip is False
+
+    def test_includes_skipped_models_with_include_skipped_true(self, mock_models_dir):
+        """Test that models with skip=true are included when include_skipped=True."""
+        (mock_models_dir / "model-included.yaml").write_text("name: test/included\n")
+        (mock_models_dir / "model-skipped.yaml").write_text(
+            "name: test/skipped\nskip: true\n"
+        )
+
+        configs = get_all_model_configs(include_skipped=True)
+
+        assert len(configs) == 2
+        # Sorted alphabetically by filename
+        assert configs[0].name == "test/included"
+        assert configs[0].skip is False
+        assert configs[1].name == "test/skipped"
+        assert configs[1].skip is True
+
+    def test_skip_defaults_to_false_in_yaml(self, mock_models_dir):
+        """Test that skip field defaults to False when not in YAML file."""
+        (mock_models_dir / "test-model.yaml").write_text("name: test/model\n")
+
+        configs = get_all_model_configs()
+
+        assert len(configs) == 1
+        assert configs[0].skip is False
+
+    def test_skip_with_options(self, mock_models_dir):
+        """Test skip field works correctly with options."""
+        (mock_models_dir / "skipped-with-options.yaml").write_text(
+            "name: test/model\noptions:\n  temperature: 0.5\nskip: true\n"
+        )
+
+        configs = get_all_model_configs()
+        assert len(configs) == 0
+
+        configs = get_all_model_configs(include_skipped=True)
+        assert len(configs) == 1
+        assert configs[0].options == {"temperature": 0.5}
+        assert configs[0].skip is True
+
+    def test_multiple_models_mixed_skip_status(self, mock_models_dir):
+        """Test with multiple models having mixed skip status."""
+        (mock_models_dir / "model-a.yaml").write_text("name: test/a\n")
+        (mock_models_dir / "model-b.yaml").write_text("name: test/b\nskip: true\n")
+        (mock_models_dir / "model-c.yaml").write_text("name: test/c\nskip: false\n")
+        (mock_models_dir / "model-d.yaml").write_text("name: test/d\nskip: true\n")
+
+        # Without include_skipped, only non-skipped models
+        configs = get_all_model_configs()
+        assert len(configs) == 2
+        names = [c.name for c in configs]
+        assert "test/a" in names
+        assert "test/c" in names
+        assert "test/b" not in names
+        assert "test/d" not in names
+
+        # With include_skipped, all models
+        configs = get_all_model_configs(include_skipped=True)
+        assert len(configs) == 4
+        skip_statuses = {c.name: c.skip for c in configs}
+        assert skip_statuses == {
+            "test/a": False,
+            "test/b": True,
+            "test/c": False,
+            "test/d": True,
+        }
 
 
 class TestFindOrCreateModelConfig:
@@ -285,6 +387,53 @@ class TestLoadModelConfigFromPath:
         config = load_model_config_from_path("models/no-name.yaml")
 
         assert config is None
+
+    def test_loads_config_with_skip_true(self, mock_models_dir):
+        """Test loading model config with skip=true."""
+        (mock_models_dir / "skipped-model.yaml").write_text(
+            "name: test/skipped\nskip: true\n"
+        )
+
+        config = load_model_config_from_path("models/skipped-model.yaml")
+
+        assert config is not None
+        assert config.name == "test/skipped"
+        assert config.skip is True
+
+    def test_loads_config_with_skip_false(self, mock_models_dir):
+        """Test loading model config with skip=false."""
+        (mock_models_dir / "included-model.yaml").write_text(
+            "name: test/included\nskip: false\n"
+        )
+
+        config = load_model_config_from_path("models/included-model.yaml")
+
+        assert config is not None
+        assert config.name == "test/included"
+        assert config.skip is False
+
+    def test_loads_config_with_skip_defaults_to_false(self, mock_models_dir):
+        """Test loading model config where skip field is omitted defaults to false."""
+        (mock_models_dir / "default-model.yaml").write_text("name: test/default\n")
+
+        config = load_model_config_from_path("models/default-model.yaml")
+
+        assert config is not None
+        assert config.name == "test/default"
+        assert config.skip is False
+
+    def test_loads_config_with_skip_and_options(self, mock_models_dir):
+        """Test loading model config with both skip and options."""
+        (mock_models_dir / "skipped-with-opts.yaml").write_text(
+            "name: test/model\noptions:\n  temperature: 0.7\nskip: true\n"
+        )
+
+        config = load_model_config_from_path("models/skipped-with-opts.yaml")
+
+        assert config is not None
+        assert config.name == "test/model"
+        assert config.options == {"temperature": 0.7}
+        assert config.skip is True
 
 
 class TestGetDisplayNameFromPath:
