@@ -86,6 +86,7 @@ def _is_transient_api_error(exception: BaseException) -> bool:
         "incomplete",
         "peer closed",
         "chunked read",
+        "overloaded",
     ]
     return any(indicator in error_msg for indicator in transient_indicators)
 
@@ -147,29 +148,36 @@ def run_benchmark_for_config(
             retry=retry_if_exception(_is_transient_api_error),
             reraise=True,
         )
-        def call_model():
-            if config.options:
-                return model.prompt(full_prompt, **config.options)
-            return model.prompt(full_prompt)
+        def call_model_and_get_response():
+            response = (
+                model.prompt(full_prompt, **config.options)
+                if config.options
+                else model.prompt(full_prompt)
+            )
+            # Extract response text and metadata while response is still available.
+            # Note: Streaming errors (like "Overloaded") occur during response.text()
+            # consumption, not during the initial prompt() call, so this must be inside
+            # the retry block to catch transient streaming failures.
+            response_text = extract_palindrome(response.text()).strip().lower()
+            response_json = response.response_json or {}
+            input_tokens = response.input_tokens or 0
+            output_tokens = response.output_tokens or 0
+            return response_text, response_json, input_tokens, output_tokens
 
         try:
-            response = call_model()
+            response_text, response_json, input_tokens, output_tokens = (
+                call_model_and_get_response()
+            )
         except Exception as e:
             print(f"Error: {e}")
             print("Skipping task after retries failed.\n")
             continue
 
-        response_text = extract_palindrome(response.text()).strip().lower()
         response_text = truncate_long_response(response_text, reference)
-        # Note: response_json is only populated after .text() consumes the stream
-        response_json = response.response_json or {}
 
         end_time = time.time()
         duration = end_time - start_time
 
-        # Get token counts from the response object (llm library stores them here)
-        input_tokens = response.input_tokens or 0
-        output_tokens = response.output_tokens or 0
         cost, cost_source = get_request_cost(
             config.name, input_tokens, output_tokens, response_json
         )
