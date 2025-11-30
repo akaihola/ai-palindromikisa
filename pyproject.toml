@@ -12,7 +12,7 @@ dependencies = [
     "click-default-group>=1.2.3",
     "livereload",
     "llm",
-    "llm-anthropic",
+    "llm-anthropic>=0.75.0",
     "llm-gemini",
     "llm-openrouter",
     "plotext",
